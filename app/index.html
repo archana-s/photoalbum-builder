@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Exercise">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="HumanAPI" />
+  <title>Album Builder</title>
+  <!-- Fonts -->
+  <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,300|Roboto' rel='stylesheet' type='text/css'>
+
+  <!-- build:css styles/main.css -->
+  <link rel="stylesheet" href="styles/main.css">
+  <!-- endbuild-->
+
+  <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <!-- endbuild -->
+
+  <!-- will be replaced with elements/elements.vulcanized.html -->
+  <link rel="import" href="elements/elements.html">
+  <!-- endreplace-->
+
+</head>
+
+<body class="fullbleed layout vertical">
+  <template is="dom-bind" id="app">
+
+    <!--
+      Routing is enabled using page.js and Iron-pages.
+      Iron-pages renders only the section with the current route from below.
+      There are 4 pages and each one is fully displayed by its element which is fully implemented in
+      the elements directory.
+    -->
+    <iron-pages attr-for-selected="data-route" selected="{{route}}">
+
+      <section data-route="home">
+        <viv-home></viv-home>
+      </section>
+
+      <section data-route="search">
+        <viv-search keywords={{params.keywords}}></viv-search>
+      </section>
+
+      <section data-route="album">
+        <viv-album></viv-album>
+      </section>
+
+      <section data-route="admin" class="layout vertical center-center">
+        <ha-admin-page></ha-admin-page>
+      </section>
+
+      <section data-route="user-edit" class="layout vertical center-center">
+        <ha-user-edit-page userid={{params.userid}}></ha-user-edit-page>
+      </section>
+
+    </iron-pages>
+  </template>
+  <!-- build:js scripts/app.js -->
+  <script src="scripts/app.js"></script>
+  <script src="scripts/vendor/random-id/randomID.js"></script>
+  <!-- endbuild-->
+</body>
+
+</html>

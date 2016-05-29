@@ -1,0 +1,52 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../searched-photos/searched-photos.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="viv-album">
+  <template>
+    <iron-localstorage name="selected-photos" id="localStorage"
+      value="{{selectedPhotos}}"
+    ></iron-localstorage>
+
+    <template is="dom-if" if="{{selectedPhotos.length}}">
+      <div>Here is your album. Delete any photos you don't like. Select them and click delete. </div>
+      <paper-button raised on-click="_deletePhotos">Delete Selected Photos</paper-button>
+      <searched-photos id="photosList" photos="{{selectedPhotos}}"></searched-photos>
+    </template>
+
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'viv-album',
+      properties: {
+        selectedPhotos: {
+          type: Array,
+          value: 0,
+          notify: true
+        }
+      },
+
+      _deletePhotos: function() {
+        var photosSelectedForDeletion = this.querySelector('#photosList').selectedPhotos;
+        var selectedPhotos = this.selectedPhotos;
+
+        photosSelectedForDeletion.forEach(function(photo) {
+          var index = selectedPhotos.indexOf(photo);
+          if (index >= 0) {
+            selectedPhotos.splice(index, 1);
+          }
+        });
+
+        this.set('selectedPhotos', []);
+        this.set('selectedPhotos', selectedPhotos);
+        this.$.localStorage.save();
+      },
+
+    });
+  })();
+  </script>
+</dom-module>

@@ -1,0 +1,154 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import"
+  href="../../bower_components/firebase-element/firebase-collection.html">
+<link rel="import" href="../utils/custom-validator.html">
+
+<dom-module id="ha-signup-button">
+  <style>
+    .sign-in {
+      color: grey;
+    }
+
+    paper-input {
+      margin-top: 0;
+    }
+  </style>
+  <template>
+
+    <firebase-collection id="user_info"
+      location="https://test-crud-app.firebaseio.com/user_info/" data="{{users}}">
+    </firebase-collection>
+
+    <!-- Sign up button -->
+    <paper-button raised class="active layout horizontal center-center user-login" on-click="_handleClick">
+      <iron-icon icon="icons:face"></iron-icon>
+      User Login
+    </paper-button>
+
+    <!-- User Sign up modal -->
+    <paper-dialog id="dialog" role="dialog" opened="false" class="vertical layout start-justified">
+      <div class="layout horizontal center-justified">
+        <paper-button>
+          <h2 class="paper-dialog-header-810">Sign up</h2>
+        </paper-button>
+        <paper-button id="signin-button" class="sign-in" disabled>
+          <h2 class="paper-dialog-header-810">Sign in (tbd)</h2>
+        </paper-button>
+        <paper-tooltip for="signin-button">Not enabling user sign in yet.</paper-tooltip>
+      </div>
+
+      <div class="error-message" id="error_message" hidden>
+        Email is already registered. Please sign in.
+      </div>
+      <div class="error-message" id="missing_error_message" hidden>
+        Please provide email and password.
+      </div>
+      <custom-validator id="isPasswordValid" validator-name="_passwordValidator"></custom-validator>
+      <custom-validator id="isEmailValid" validator-name="_emailValidator"></custom-validator>
+      <paper-input auto-validate label="Email" id="email" validator="_emailValidator" error_message="Invalid email address"></paper-input>
+      <paper-input auto-validate type="password" label="Password" id="password" validator="_passwordValidator"
+        error-message="Password should be atleast 8 chars long and can contain atleast one numeral"></paper-input>
+
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button on-click="_handleSignupClick">Sign up</paper-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'ha-signup-button',
+      properties: {
+        username: String,
+        password: String,
+        emailAddress: String,
+        users: {
+          type: Array
+        }
+      },
+
+      ready: function() {
+        this.$.dialog.opened = false;
+        this.$.isPasswordValid.validate = this._passwordValidator.bind(this);
+        this.$.isEmailValid.validate = this._emailValidator.bind(this);
+        this.$.error_message.hide = true;
+      },
+
+      _handleClick: function() {
+        this.$.dialog.open();
+      },
+
+      _passwordValidator: function(password) {
+        return password.length >= 8 && password.length < 100 && /^[0-9A-Za-z_]+$/.test(password)
+          && /[0-9]+/.test(password);
+      },
+
+      _emailValidator: function(email) {
+        return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/.test(email);
+      },
+
+      hasValidationErrors: function() {
+        this.$.error_message.hidden = true;
+        this.$.missing_error_message.hidden = true;
+
+        if (this.$.email.value === '' || this.$.password === '') {
+          this.$.missing_error_message.hidden = false;
+          return true;
+        }
+
+        var showErrorMessage = false;
+        var users = this.users.forEach(function(user) {
+          if(user.email === this.$.email.value) {
+            showErrorMessage = true;
+            return;
+          }
+        }.bind(this));
+
+        if(showErrorMessage) {
+          this.$.error_message.hidden = false;
+          return true;
+        }
+
+        return false;
+      },
+
+      _handleSignupClick: function() {
+        // Using a utility called randomID to get 20 char long unique ids.
+        var id = randomID(20,"aA0");
+
+        // Show error message is user already has been registered.
+        if(this.hasValidationErrors()) {
+          this.$.dialog.opened = true;
+        } else {
+          this.$.user_info.query.push({
+            "id": id,
+            "email": this.$.email.value,
+            "password": this.$.password.value,
+            "created_at": Date(),
+            "updated_at": Date(),
+            "api_tokens": []
+          });
+          this.$.dialog.opened = false;
+          window.location.href = '/#!/user/' + this.$.email.value;
+          // Polymer does not reload with window.location.href, hence manually reloading.
+          window.location.reload();
+        }
+      }
+    });
+  })();
+  </script>
+</dom-module>

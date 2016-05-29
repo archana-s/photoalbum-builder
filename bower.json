@@ -1,0 +1,26 @@
+{
+  "name": "polymer-starter-kit",
+  "private": true,
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.1.0",
+    "iron-elements": "PolymerElements/iron-elements#^1.0.0",
+    "paper-elements": "PolymerElements/paper-elements#^1.0.1",
+    "platinum-elements": "PolymerElements/platinum-elements#^1.1.0",
+    "neon-elements": "PolymerElements/neon-elements#^1.0.0",
+    "page": "visionmedia/page.js#~1.6.3",
+    "firebase-element": "GoogleWebComponents/firebase-element#~1.0.6",
+    "neon-animation": "PolymerElements/neon-animation#~1.0.6",
+    "iron-media-query": "PolymerElements/iron-media-query#~1.0.3",
+    "paper-tooltip": "PolymerElements/paper-tooltip#~1.1.2",
+    "iron-validator-behavior": "PolymerElements/iron-validator-behavior#~1.0.1",
+    "paper-tabs": "PolymerElements/paper-tabs#~1.4.1",
+    "paper-card": "PolymerElements/paper-card#~1.1.1",
+    "iron-ajax": "PolymerElements/iron-ajax#~1.2.0",
+    "paper-checkbox": "PolymerElements/paper-checkbox#~1.2.0",
+    "iron-localstorage": "PolymerElements/iron-localstorage#~1.0.5"
+  },
+  "devDependencies": {
+    "web-component-tester": "^4.0.0",
+    "test-fixture": "PolymerElements/test-fixture#^1.0.0"
+  }
+}

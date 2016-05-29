@@ -1,0 +1,88 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="searched-photos">
+  <style>
+    paper-input {
+      width: 300px;
+    }
+
+    li {
+      position: relative;
+      margin: 8px;
+    }
+
+    li:hover input[type="checkbox"]{
+      display: inline-block;
+    }
+
+    input[type="checkbox"] {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+
+    input[type="checkbox"]:not(:checked) {
+      display: none;
+    }
+
+    input[type="checkbox"]:checked ~ img {
+      border: 3px solid blue;
+    }
+
+  </style>
+
+  <template>
+    <ul id="photosList" class="layout horizontal center-center wrap" on-click="_handlePhotoSelection">
+      <template is="dom-repeat" items="{{photos}}" as="photo">
+        <li>
+          <input type="checkbox" data-id="{{fetchImageUrl(photo)}}" id="{{index}}">
+            <img src="{{fetchImageUrl(photo)}}">
+          </input>
+        </li>
+      </template>
+    </ul>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'searched-photos',
+
+      properties: {
+        photos: {
+          type: Array,
+          value: [],
+          observer: '_photosChanged'
+        },
+        selectedPhotos: {
+          type: Array,
+          value: []
+        }
+      },
+
+      fetchImageUrl: function(photo) {
+        return `http://c2.staticflickr.com/${photo.farm}/${photo.server}/${photo.id}_${photo.secret}_s.jpg`;
+      },
+
+      _handlePhotoSelection: function(evt) {
+        if (evt.target.nodeName.toLowerCase() === 'input') {
+          var index = parseInt(evt.target.id, 10);
+          if (evt.target.checked) {
+            this.selectedPhotos.push(this.photos[index]);
+          } else {
+            var removeIndex = this.selectedPhotos.indexOf(this.photos[index]);
+            if (removeIndex >= 0) {
+              this.selectedPhotos.splice(removeIndex, 1);
+            }
+          }
+        }
+      },
+
+      _photosChanged: function() {
+        this.notifyPath('photos', this.photos);
+      }
+    });
+  })();
+  </script>
+</dom-module>

@@ -1,0 +1,121 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../utils/custom-validator.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../searched-photos/searched-photos.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+
+<dom-module id="viv-search">
+  <style>
+    paper-input {
+      width: 300px;
+    }
+  </style>
+
+  <template>
+
+    <iron-localstorage name="selected-photos"
+      value="{{selectedPhotos}}"
+    ></iron-localstorage>
+
+    <iron-ajax
+      id="ajaxRequest"
+      url="https://api.flickr.com/services/rest/"
+      handle-as="json"
+      debounce-duration="300"
+      on-response="_handleResponse"
+      on-error="_handleError"
+      last-response="{{photos}}"></iron-ajax>
+
+    <template is="dom-if" if="{{!keywords}}">
+      <section id="search-only-page" class="layout vertical center-center">
+        <custom-validator id="isSearchValid" validator-name="_searchValidator"></custom-validator>
+        <paper-input auto-validate label="Search by tags or location"
+          id="searchInput" validator="_searchValidator" error_message="Invalid search entry"></paper-input>
+        <paper-button on-click="_searchForKeywords">Search</paper-button>
+      </section>
+    </template>
+
+    <template is="dom-if" if="{{keywords}}">
+      <section>
+        <template is="dom-if" if="{{photos}}">
+          <div>Select photos to add to your album</div>
+          <paper-button on-click="_addPhotosToAlbum">Add Photos to Album</paper-button>
+          <searched-photos id="searchedPhotos" photos="{{photos.photos.photo}}"></searched-photos>
+        </template>
+      </section>
+    </template>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'viv-search',
+
+      properties: {
+        keywords: {
+          type: String,
+          value: '',
+          observer: '_keywordsChanged'
+        },
+        photos: {
+          type: Array,
+          observer: '_photosChanged'
+        },
+        selectedPhotos: {
+          type: Array,
+          value: []
+        }
+      },
+
+      _keywordsChanged: function() {
+        if (this.keywords) {
+          var params = {
+            method: 'flickr.photos.search',
+            api_key: '0f4ec4e9d9c10e3a270eaa6e866abaeb',
+            tags: this.keywords,
+            format: 'json',
+            nojsoncallback: 1
+          };
+          this.$.ajaxRequest.params = params;
+          this.$.ajaxRequest.generateRequest();
+        }
+      },
+
+      _searchValidator: function(keywords) {
+        return true;
+      },
+
+      _searchForKeywords: function() {
+        var keywords = this.$.searchInput.value;
+        window.location.href = `/#!/search/${keywords}`;
+        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
+        // hence using a button with an action.
+        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
+        window.location.reload();
+      },
+
+      _handleResponse: function(e) {
+      },
+
+      _handleError: function(err) {
+      },
+
+      _photosChanged: function() {
+      },
+
+      _addPhotosToAlbum: function() {
+        this.set('selectedPhotos', this.selectedPhotos.concat(this.querySelector('#searchedPhotos').selectedPhotos));
+        window.location.href = '/#!/album';
+        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
+        // hence using a button with an action.
+        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
+        window.location.reload();
+      }
+    });
+  })();
+  </script>
+</dom-module>

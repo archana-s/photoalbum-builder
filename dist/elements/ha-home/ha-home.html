@@ -1,0 +1,37 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../ha-header/ha-header.html">
+<link rel="import" href="../ha-admin-login-button/ha-admin-login-button.html">
+<link rel="import" href="../ha-user-login-button/ha-user-login-button.html">
+
+<dom-module id="ha-home">
+  <style>
+    :host {
+      height: 100%;
+    }
+
+    :host main {
+      height: 100%;
+      margin: auto 0;
+    }
+
+    :host ha-admin-login-button {
+      padding-bottom: 12px;
+    }
+  </style>
+  <template>
+    <main class="layout vertical center-center">
+      <ha-header class="self-center"></ha-header>
+      <ha-admin-login-button></ha-admin-login-button>
+      <ha-signup-button></ha-signup-button>
+    </main>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'ha-home'
+    });
+  })();
+  </script>
+</dom-module>

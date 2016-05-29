@@ -1,0 +1,31 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="album-builder-button">
+  <template>
+    <paper-button raised on-click="_goToAlbumSearchPage">
+      <iron-icon icon="icons:add"></iron-icon>
+      Add your first album
+    </paper-button>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'album-builder-button',
+
+      _goToAlbumSearchPage: function() {
+        window.location.href = '/#!/search';
+        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
+        // hence using a button with an action.
+        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
+        window.location.reload();
+      }
+    });
+  })();
+  </script>
+</dom-module>
