@@ -32,15 +32,23 @@
   </style>
 
   <template>
+    <template is="dom-if" if="{{photos.length}}">
+      <section class="horizontal layout">
+        <paper-button on-click="_selectAllPhotos">Select All</paper-button>
+        <paper-button on-click="_unselectAllPhotos">Clear All Selections</paper-button>
+      </section>
+    </template>
+
     <ul id="photosList" class="layout horizontal center-center wrap" on-click="_handlePhotoSelection">
       <template is="dom-repeat" items="{{photos}}" as="photo">
         <li>
-          <input type="checkbox" data-id="{{fetchImageUrl(photo)}}" id="{{index}}">
+          <input type="checkbox" data-id="{{fetchImageUrl(photo)}}" id="{{photo.id}}">
             <img src="{{fetchImageUrl(photo)}}">
           </input>
         </li>
       </template>
     </ul>
+
   </template>
   <script>
   (function() {
@@ -65,13 +73,24 @@
         return `http://c2.staticflickr.com/${photo.farm}/${photo.server}/${photo.id}_${photo.secret}_s.jpg`;
       },
 
+      fetchPhotoForId: function(photoId) {
+        for(var i=0; i<this.photos.length; i++) {
+          if (this.photos[i].id === photoId) {
+            return this.photos[i];
+          }
+        }
+        return null;
+      },
+
       _handlePhotoSelection: function(evt) {
         if (evt.target.nodeName.toLowerCase() === 'input') {
-          var index = parseInt(evt.target.id, 10);
+          var photoId = evt.target.id;
+          var photo = this.fetchPhotoForId(photoId);
+
           if (evt.target.checked) {
-            this.selectedPhotos.push(this.photos[index]);
+            this.selectedPhotos.push(photo);
           } else {
-            var removeIndex = this.selectedPhotos.indexOf(this.photos[index]);
+            var removeIndex = this.selectedPhotos.indexOf(photo);
             if (removeIndex >= 0) {
               this.selectedPhotos.splice(removeIndex, 1);
             }
@@ -81,6 +100,20 @@
 
       _photosChanged: function() {
         this.notifyPath('photos', this.photos);
+      },
+
+      _selectAllPhotos: function() {
+        this.set('selectedPhotos', this.photos);
+        Array.prototype.slice.apply(this.querySelectorAll('input[type="checkbox"]')).forEach(function(node) {
+          node.checked = true;
+        });
+      },
+
+      _unselectAllPhotos: function() {
+        this.set('selectedPhotos', []);
+        Array.prototype.slice.apply(this.querySelectorAll('input[type="checkbox"]')).forEach(function(node) {
+          node.checked = false;
+        });
       }
     });
   })();

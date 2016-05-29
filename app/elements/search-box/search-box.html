@@ -1,0 +1,47 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../utils/custom-validator.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="search-box">
+  <style>
+    paper-input {
+      width: 300px;
+    }
+  </style>
+
+  <template>
+
+    <section id="search-only-page" class="layout horizontal center-center">
+      <custom-validator id="isSearchValid" validator-name="_searchValidator"></custom-validator>
+      <paper-input auto-validate label="Search by tags or location"
+        id="searchInput" validator="_searchValidator" error_message="Invalid search entry"></paper-input>
+      <paper-button on-click="_searchForKeywords">Search</paper-button>
+    </section>
+
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'search-box',
+
+      _searchValidator: function(keywords) {
+        return true;
+      },
+
+      _searchForKeywords: function() {
+        var keywords = encodeURIComponent(this.$.searchInput.value);
+      //  keywords = keywords.replace(/\s+/, '%20');
+        window.location.href = `/#!/search/${keywords}`;
+        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
+        // hence using a button with an action.
+        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
+        window.location.reload();
+      },
+    });
+  })();
+  </script>
+</dom-module>

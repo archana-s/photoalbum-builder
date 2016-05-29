@@ -1,11 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../utils/custom-validator.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../searched-photos/searched-photos.html">
 <link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../search-box/search-box.html">
 
 <dom-module id="viv-search">
   <style>
@@ -27,23 +27,22 @@
       debounce-duration="300"
       on-response="_handleResponse"
       on-error="_handleError"
-      last-response="{{photos}}"></iron-ajax>
+      last-response="{{response}}"></iron-ajax>
 
-    <template is="dom-if" if="{{!keywords}}">
-      <section id="search-only-page" class="layout vertical center-center">
-        <custom-validator id="isSearchValid" validator-name="_searchValidator"></custom-validator>
-        <paper-input auto-validate label="Search by tags or location"
-          id="searchInput" validator="_searchValidator" error_message="Invalid search entry"></paper-input>
-        <paper-button on-click="_searchForKeywords">Search</paper-button>
-      </section>
-    </template>
+    <search-box></search-box>
+    <paper-button on-click="_goToAlbum">Go to album</paper-button>
 
     <template is="dom-if" if="{{keywords}}">
       <section>
-        <template is="dom-if" if="{{photos}}">
+        <template is="dom-if" if="{{photos.length}}">
           <div>Select photos to add to your album</div>
           <paper-button on-click="_addPhotosToAlbum">Add Photos to Album</paper-button>
-          <searched-photos id="searchedPhotos" photos="{{photos.photos.photo}}"></searched-photos>
+          <searched-photos id="searchedPhotos" photos="{{photos}}"></searched-photos>
+
+          <template is="dom-if" if="{{areThereMorePagesToLoad}}">
+            <paper-button on-click="_loadMorePhotos">Load more ...</paper-button>
+          </template>
+
         </template>
       </section>
     </template>
@@ -63,39 +62,54 @@
         },
         photos: {
           type: Array,
-          observer: '_photosChanged'
+          observer: '_photosChanged',
+          value: [],
+          notify: true
         },
         selectedPhotos: {
           type: Array,
           value: []
-        }
+        },
+        currentPage: {
+          type: Number,
+          value: 1
+        },
+        maxPages: {
+          type: Number,
+          value: 0
+        },
+        response: {
+          type: Object,
+          value: null,
+          observer: "_responseChanged"
+        },
+        areThereMorePagesToLoad: false
       },
 
-      _keywordsChanged: function() {
+      getPhotosFromFlickr: function() {
         if (this.keywords) {
+          var keywords = decodeURIComponent(this.keywords);
           var params = {
             method: 'flickr.photos.search',
-            api_key: '0f4ec4e9d9c10e3a270eaa6e866abaeb',
-            tags: this.keywords,
+            api_key: '28f7fbbe33e2b2e762f63f7f0d78c05c',
+            tags: keywords,
             format: 'json',
-            nojsoncallback: 1
+            nojsoncallback: 1,
+            page: this.currentPage
           };
           this.$.ajaxRequest.params = params;
           this.$.ajaxRequest.generateRequest();
         }
       },
 
-      _searchValidator: function(keywords) {
-        return true;
+      resetCounters: function() {
+        this.currentPage = 1;
+        this.maxPages = 0;
       },
 
-      _searchForKeywords: function() {
-        var keywords = this.$.searchInput.value;
-        window.location.href = `/#!/search/${keywords}`;
-        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
-        // hence using a button with an action.
-        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
-        window.location.reload();
+      _keywordsChanged: function() {
+        this.resetCounters();
+        this.getPhotosFromFlickr();
       },
 
       _handleResponse: function(e) {
@@ -107,14 +121,42 @@
       _photosChanged: function() {
       },
 
-      _addPhotosToAlbum: function() {
-        this.set('selectedPhotos', this.selectedPhotos.concat(this.querySelector('#searchedPhotos').selectedPhotos));
+      _responseChanged: function() {
+        if (this.response && this.response.photos && typeof this.response.photos === 'object') {
+          this.maxPages = this.response.photos.pages;
+          this.areThereMorePagesToLoad = this.currentPage < this.maxPages;
+          this.set('photos', this.photos.concat(this.response.photos.photo));
+        }
+      },
+
+      goToAlbum: function() {
         window.location.href = '/#!/album';
         // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
         // hence using a button with an action.
         // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
         window.location.reload();
+      },
+
+      _addPhotosToAlbum: function() {
+        this.set('selectedPhotos', this.selectedPhotos.concat(this.querySelector('#searchedPhotos').selectedPhotos));
+        this.goToAlbum();
+      },
+
+      _loadMorePhotos: function() {
+        this.currentPage++;
+        this.getPhotosFromFlickr();
+      },
+
+      _goToAlbum: function() {
+        if (this.querySelector('#searchedPhotos').selectedPhotos.length) {
+          var warning = `You have some images selected. If you move without adding them,
+            they will not be added to your album. Are you sure you want to move to album?`;
+          if (window.confirm(warning)) {
+            this.goToAlbum();
+          }
+        }
       }
+      
     });
   })();
   </script>

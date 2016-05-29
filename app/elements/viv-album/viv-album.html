@@ -2,6 +2,7 @@
 
 <link rel="import" href="../searched-photos/searched-photos.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../search-box/search-box.html">
 
 <dom-module id="viv-album">
   <template>
@@ -9,10 +10,17 @@
       value="{{selectedPhotos}}"
     ></iron-localstorage>
 
+    <search-box></search-box>
+    <h1 contenteditable="true"> My album </h1>
+
     <template is="dom-if" if="{{selectedPhotos.length}}">
       <div>Here is your album. Delete any photos you don't like. Select them and click delete. </div>
       <paper-button raised on-click="_deletePhotos">Delete Selected Photos</paper-button>
       <searched-photos id="photosList" photos="{{selectedPhotos}}"></searched-photos>
+    </template>
+
+    <template is="dom-if" id="{{!selectedPhotos.length}}">
+      <p> You have no photos in your album. Search for photos and add them. Use the search box above.</p>
     </template>
 
   </template>
