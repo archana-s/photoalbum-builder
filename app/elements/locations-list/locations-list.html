@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+
+<dom-module id="locations-list">
+  <template>
+    <h3>Do you want to search by any of these locations? </h3>
+    <paper-menu id="locationMenu">
+      <template is="dom-repeat" items="{{locations}}" as="location">
+        <paper-item>{{location.formatted_address}}</paper-item>
+      </template>
+    </paper-menu>
+    <paper-button on-click="_getLocation">Choose</paper-button>
+    <paper-button on-click="_cancelLocation">Cancel</paper-button>
+  </template>
+
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'locations-list',
+
+      properties: {
+        locations: {
+          type: Array,
+          value: []
+        }
+      },
+
+      _getLocation: function() {
+        var selectedIndex = this.$.locationMenu.selected;
+        var location = this.locations[selectedIndex];
+        this.fire('location:chosen', {lat: location.geometry.location.lat, lng: location.geometry.location.lng});
+      },
+
+      _cancelLocation: function() {
+        this.fire('location:cancelled');
+      }
+
+    });
+  })();
+  </script>
+</dom-module>

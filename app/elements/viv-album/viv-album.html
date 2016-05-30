@@ -39,7 +39,7 @@
       },
 
       _deletePhotos: function() {
-        var photosSelectedForDeletion = this.querySelector('#photosList').selectedPhotos;
+        var photosSelectedForDeletion = Object.create(this.querySelector('#photosList').selectedPhotos);
         var selectedPhotos = this.selectedPhotos;
 
         photosSelectedForDeletion.forEach(function(photo) {

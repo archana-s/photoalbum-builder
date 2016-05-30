@@ -5,7 +5,9 @@
 <link rel="import" href="../searched-photos/searched-photos.html">
 <link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-request.html">
 <link rel="import" href="../search-box/search-box.html">
+<link rel="import" href="../locations-list/locations-list.html">
 
 <dom-module id="viv-search">
   <style>
@@ -29,8 +31,14 @@
       on-error="_handleError"
       last-response="{{response}}"></iron-ajax>
 
+    <iron-request id="mapsApiRequest"></iron-request>
+
     <search-box></search-box>
     <paper-button on-click="_goToAlbum">Go to album</paper-button>
+
+    <template is="dom-if" if="{{locations.length}}">
+      <locations-list locations={{locations}}></locations-list>
+    </template>
 
     <template is="dom-if" if="{{keywords}}">
       <section>
@@ -83,22 +91,68 @@
           value: null,
           observer: "_responseChanged"
         },
-        areThereMorePagesToLoad: false
+        areThereMorePagesToLoad: false,
+        locations: {
+          type: Array,
+          value: [],
+          notify: true
+        }
       },
 
-      getPhotosFromFlickr: function() {
+      ready: function() {
+        this.setUpEventListeners();
+      },
+
+      setUpEventListeners: function() {
+        this.addEventListener('location:chosen', function(data) {
+          var result = data.detail;
+          this.getPhotosFromFlickr(result.lat, result.lng);
+          this.set('locations', []);
+        });
+        this.addEventListener('location:cancelled', function() {
+          this.getPhotosFromFlickr();
+          this.set('locations', []);
+        });
+      },
+
+      // If the keywords provided is a valid address/geographic location
+      // pick up images from the corresponding lat and long.
+      // If not fetch images for the keywords.
+      getPhotosFromFlickr: function(lat, long) {
         if (this.keywords) {
           var keywords = decodeURIComponent(this.keywords);
           var params = {
             method: 'flickr.photos.search',
-            api_key: '28f7fbbe33e2b2e762f63f7f0d78c05c',
-            tags: keywords,
+            api_key: '57b480dfc5cb523391b1e791f5fb48fc',
             format: 'json',
             nojsoncallback: 1,
             page: this.currentPage
           };
+          if (lat && long) {
+            params.lat = lat;
+            params.lng = lng;
+          } else {
+            params.tags = keywords;
+          }
           this.$.ajaxRequest.params = params;
           this.$.ajaxRequest.generateRequest();
+        }
+      },
+
+      // Invokes a google maps api call to check if the entered keywords
+      // correspond to a location.
+      // If they do, the result data will not be empty.
+      // This returns a promise from iron-request.
+      getLatLongFromMaps: function() {
+        if (this.keywords) {
+          // iron-request is not doing anything with params object, even though it should be.
+          // hence manually building the query string. Todo(send a PR to iron-request.html)
+          var requestObj = {
+            url: 'https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDgAkhTXjPX0JuZyvsNska5YJPcIL48zMc&address=' + encodeURIComponent(this.keywords),
+          }
+          return this.$.mapsApiRequest.send(requestObj);
+        } else {
+          return null;
         }
       },
 
@@ -109,7 +163,22 @@
 
       _keywordsChanged: function() {
         this.resetCounters();
-        this.getPhotosFromFlickr();
+        // Try to check if the keywors typed is actually a location.
+        var mapsApiResponse = this.getLatLongFromMaps();
+        if (mapsApiResponse) {
+          mapsApiResponse.then(function(response) {
+            var mapsResult = JSON.parse(response.response);
+            if(mapsResult.results.length) {
+              this.set('locations', mapsResult.results);
+              // Check if they meant any of these places.
+              // If so, pull it using lat long, if not just pull using tagnames.
+            } else {
+              this.getPhotosFromFlickr();
+            }
+          }.bind(this), function(err) {
+            this.getPhotosFromFlickr();
+          }.bind(this));
+        }
       },
 
       _handleResponse: function(e) {
@@ -156,7 +225,7 @@
           }
         }
       }
-      
+
     });
   })();
   </script>

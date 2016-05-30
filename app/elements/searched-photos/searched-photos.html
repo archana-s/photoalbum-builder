@@ -103,7 +103,8 @@
       },
 
       _selectAllPhotos: function() {
-        this.set('selectedPhotos', this.photos);
+        this.selectedPhotos = this.photos;
+        // this.set('selectedPhotos', this.photos);
         Array.prototype.slice.apply(this.querySelectorAll('input[type="checkbox"]')).forEach(function(node) {
           node.checked = true;
         });
