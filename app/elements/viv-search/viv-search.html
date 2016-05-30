@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../searched-photos/searched-photos.html">
 <link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
@@ -11,8 +10,46 @@
 
 <dom-module id="viv-search">
   <style>
+
+    :host {
+      background-color: #DDD;
+    }
+
     paper-input {
       width: 300px;
+    }
+
+    paper-button.load-more {
+      width: 180px;
+      margin: 20px 0  ;
+    }
+
+    .search-section {
+      position: relative;
+      margin-top: 24px;
+      background-color: #F6F6F6;
+      padding: 18px 0;
+    }
+
+    paper-button.add-photos {
+      position: absolute;
+      top: 18px;
+      left: 16px;
+      font-size: 12px;
+    }
+
+    paper-button.add-photos iron-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    search-box {
+      flex: 1;
+      align-self: flex-start;
+    }
+
+    .tool-box {
+      align-items: center;
     }
   </style>
 
@@ -33,22 +70,34 @@
 
     <iron-request id="mapsApiRequest"></iron-request>
 
-    <search-box></search-box>
-    <paper-button on-click="_goToAlbum">Go to album</paper-button>
+    <section class="tool-box layout horizontal wrap">
+      <div class="flex-1">
+        <search-box></search-box>
+      </div>
+      <template is="dom-if" if="{{selectedPhotos}}">
+        <paper-button raised on-click="_goToAlbum" class="passive">Go to album</paper-button>
+      </template>
+    </section>
 
     <template is="dom-if" if="{{locations.length}}">
       <locations-list locations={{locations}}></locations-list>
     </template>
 
     <template is="dom-if" if="{{keywords}}">
-      <section>
+      <section class="search-section">
         <template is="dom-if" if="{{photos.length}}">
-          <div>Select photos to add to your album</div>
-          <paper-button on-click="_addPhotosToAlbum">Add Photos to Album</paper-button>
+
+          <paper-button raised on-click="_addPhotosToAlbum" class="primary add-photos">
+            <iron-icon icon="icons:add"></iron-icon>
+            Add Photos to Album
+          </paper-button>
+
           <searched-photos id="searchedPhotos" photos="{{photos}}"></searched-photos>
 
           <template is="dom-if" if="{{areThereMorePagesToLoad}}">
-            <paper-button on-click="_loadMorePhotos">Load more ...</paper-button>
+            <div class="layout horizontal center-center">
+              <paper-button raised on-click="_loadMorePhotos" class="load-more passive">Load more ...</paper-button>
+            </div>
           </template>
 
         </template>
@@ -207,6 +256,9 @@
       },
 
       _addPhotosToAlbum: function() {
+        if (!this.selectedPhotos) {
+          this.selectedPhotos = [];
+        }
         this.set('selectedPhotos', this.selectedPhotos.concat(this.querySelector('#searchedPhotos').selectedPhotos));
         this.goToAlbum();
       },
@@ -223,6 +275,8 @@
           if (window.confirm(warning)) {
             this.goToAlbum();
           }
+        } else {
+          this.goToAlbum();
         }
       }
 

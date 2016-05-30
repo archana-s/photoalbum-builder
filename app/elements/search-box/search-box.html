@@ -3,21 +3,32 @@
 <link rel="import" href="../utils/custom-validator.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 
 <dom-module id="search-box">
   <style>
     paper-input {
       width: 300px;
     }
+
+    paper-icon-button {
+      border-radius: 100%;
+    }
+
+    .search-box {
+      align-items: center;
+    }
+
   </style>
 
   <template>
 
-    <section id="search-only-page" class="layout horizontal center-center">
+    <section class="layout horizontal" class="search-box">
       <custom-validator id="isSearchValid" validator-name="_searchValidator"></custom-validator>
       <paper-input auto-validate label="Search by tags or location"
         id="searchInput" validator="_searchValidator" error_message="Invalid search entry"></paper-input>
-      <paper-button on-click="_searchForKeywords">Search</paper-button>
+      <paper-icon-button raised on-click="_searchForKeywords" icon="icons:search" class="passive"></paper-icon-button>
     </section>
 
   </template>

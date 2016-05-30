@@ -33,29 +33,32 @@
       There are 4 pages and each one is fully displayed by its element which is fully implemented in
       the elements directory.
     -->
-    <iron-pages attr-for-selected="data-route" selected="{{route}}">
+    <viv-header></viv-header>
+    <main>
+      <iron-pages attr-for-selected="data-route" selected="{{route}}">
 
-      <section data-route="home">
-        <viv-home></viv-home>
-      </section>
+        <section data-route="home">
+          <viv-home></viv-home>
+        </section>
 
-      <section data-route="search">
-        <viv-search keywords={{params.keywords}}></viv-search>
-      </section>
+        <section data-route="search">
+          <viv-search keywords={{params.keywords}}></viv-search>
+        </section>
 
-      <section data-route="album">
-        <viv-album></viv-album>
-      </section>
+        <section data-route="album">
+          <viv-album></viv-album>
+        </section>
 
-      <section data-route="admin" class="layout vertical center-center">
-        <ha-admin-page></ha-admin-page>
-      </section>
+        <section data-route="admin" class="layout vertical center-center">
+          <ha-admin-page></ha-admin-page>
+        </section>
 
-      <section data-route="user-edit" class="layout vertical center-center">
-        <ha-user-edit-page userid={{params.userid}}></ha-user-edit-page>
-      </section>
+        <section data-route="user-edit" class="layout vertical center-center">
+          <ha-user-edit-page userid={{params.userid}}></ha-user-edit-page>
+        </section>
 
-    </iron-pages>
+      </iron-pages>
+    </main>
   </template>
   <!-- build:js scripts/app.js -->
   <script src="scripts/app.js"></script>

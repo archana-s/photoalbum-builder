@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="viv-header">
+  <style>
+    header {
+      padding: 20px;
+      border-bottom: 1px dotted #DDD;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    h1 {
+      padding-left: 14px;
+    }
+
+    iron-icon {
+      color: #B2465B;
+    }
+
+  </style>
+  <template>
+    <header class="layout horizontal" on-click="_onHeaderClick">
+      <iron-icon icon="image:camera-roll"></iron-icon>
+      <h1>Photo Album Builder</h1>
+    </header>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'viv-header',
+      _onHeaderClick: function() {
+        window.location.href = '#!';
+        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
+        // hence using a button with an action.
+        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
+        window.location.reload();
+      }
+    });
+  })();
+  </script>
+</dom-module>

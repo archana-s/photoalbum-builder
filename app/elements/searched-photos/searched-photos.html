@@ -8,7 +8,7 @@
 
     li {
       position: relative;
-      margin: 8px;
+      margin: 20px;
     }
 
     li:hover input[type="checkbox"]{
@@ -29,13 +29,33 @@
       border: 3px solid blue;
     }
 
+    iron-icon {
+      width: 10px;
+      height: 10px;
+    }
+
+    ul#photosList {
+      margin-top: 12px;
+    }
+
+    .action-box {
+      margin-right: 24px;
+    }
+
   </style>
 
   <template>
+
     <template is="dom-if" if="{{photos.length}}">
-      <section class="horizontal layout">
-        <paper-button on-click="_selectAllPhotos">Select All</paper-button>
-        <paper-button on-click="_unselectAllPhotos">Clear All Selections</paper-button>
+      <section class="horizontal layout end-justified action-box">
+        <paper-button raised on-click="_selectAllPhotos" class="secondary">
+          <iron-icon icon="image:collections"></iron-icon>
+          Select All
+        </paper-button>
+        <paper-button raised on-click="_unselectAllPhotos" class="secondary">
+          <iron-icon icon="icons:remove"></iron-icon>
+          Clear All Selections
+        </paper-button>
       </section>
     </template>
 
