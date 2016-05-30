@@ -7,19 +7,19 @@
 <dom-module id="viv-album">
   <template>
     <iron-localstorage name="selected-photos" id="localStorage"
-      value="{{selectedPhotos}}"
+      value="{{photos}}"
     ></iron-localstorage>
 
     <search-box></search-box>
     <h1 contenteditable="true"> My album </h1>
 
-    <template is="dom-if" if="{{selectedPhotos.length}}">
+    <template is="dom-if" if="{{photos.length}}">
       <div>Here is your album. Delete any photos you don't like. Select them and click delete. </div>
       <paper-button raised on-click="_deletePhotos">Delete Selected Photos</paper-button>
-      <searched-photos id="photosList" photos="{{selectedPhotos}}"></searched-photos>
+      <searched-photos id="photosList" photos="{{photos}}"></searched-photos>
     </template>
 
-    <template is="dom-if" id="{{!selectedPhotos.length}}">
+    <template is="dom-if" if="{{!photos.length}}">
       <p> You have no photos in your album. Search for photos and add them. Use the search box above.</p>
     </template>
 
@@ -31,7 +31,7 @@
     Polymer({
       is: 'viv-album',
       properties: {
-        selectedPhotos: {
+        photos: {
           type: Array,
           value: 0,
           notify: true
@@ -39,18 +39,20 @@
       },
 
       _deletePhotos: function() {
-        var photosSelectedForDeletion = Object.create(this.querySelector('#photosList').selectedPhotos);
-        var selectedPhotos = this.selectedPhotos;
-
-        photosSelectedForDeletion.forEach(function(photo) {
-          var index = selectedPhotos.indexOf(photo);
-          if (index >= 0) {
-            selectedPhotos.splice(index, 1);
-          }
+        var photosSelectedForDeletion = this.querySelector('#photosList').selectedPhotos;
+        var photoIdsSelectedForDeletion = photosSelectedForDeletion.map(function(photo) {
+          return photo.id;
         });
 
-        this.set('selectedPhotos', []);
-        this.set('selectedPhotos', selectedPhotos);
+        var photos = JSON.parse(JSON.stringify(this.photos));
+
+        for(var i=photos.length-1; i >= 0; i--) {
+          if (photoIdsSelectedForDeletion.indexOf(photos[i].id) >= 0) {
+            photos.splice(i, 1);
+          }
+        }
+
+        this.set('photos', photos);
         this.$.localStorage.save();
       },
 

@@ -61,11 +61,14 @@
         photos: {
           type: Array,
           value: [],
-          observer: '_photosChanged'
+          observer: '_photosChanged',
+          notify: true
         },
         selectedPhotos: {
           type: Array,
-          value: []
+          value: [],
+          notify: true,
+          observer: '_selectedPhotosChanged'
         }
       },
 
@@ -100,6 +103,10 @@
 
       _photosChanged: function() {
         this.notifyPath('photos', this.photos);
+      },
+
+      _selectedPhotosChanged: function() {
+        this.notifyPath('selectedPhotos', this.selectedPhotos);
       },
 
       _selectAllPhotos: function() {
