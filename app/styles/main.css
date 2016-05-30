@@ -65,3 +65,48 @@ paper-button.secondary {
 paper-button.secondary:first-letter {
   text-transform: uppercase;
 }
+
+.presentation-area, .empty-state {
+  position: relative;
+  margin-top: 24px;
+  background-color: #F6F6F6;
+}
+
+.empty-state {
+  padding: 18px 24px;
+  height: 120px;
+  color: #AAA;
+}
+
+.empty-state iron-icon {
+  margin: 0 8px;
+}
+
+.presentation-area {
+  padding: 18px 0;
+}
+
+.presentation-area .external-action-button {
+  position: absolute;
+  top: 18px;
+  left: 16px;
+  font-size: 12px;
+}
+
+iron-icon.small {
+  width: 18px;
+  height: 18px;
+}
+
+.auxiliary {
+  font-size: 14px;
+  color: #444;
+}
+
+.auxiliary::before {
+  content: ' (';
+}
+
+.auxiliary::after {
+  content: ') ';
+}

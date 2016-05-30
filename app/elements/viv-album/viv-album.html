@@ -5,22 +5,43 @@
 <link rel="import" href="../search-box/search-box.html">
 
 <dom-module id="viv-album">
+  <style>
+    .title-section {
+      flex: 1;
+    }
+  </style>
   <template>
     <iron-localstorage name="selected-photos" id="localStorage"
       value="{{photos}}"
     ></iron-localstorage>
 
-    <search-box></search-box>
-    <h1 contenteditable="true"> My album </h1>
+    <header class="layout horizontal">
+      <section class="title-section">
+        <h1>
+          <div contenteditable="=true">My album</div>
+          <template is="dom-if" if="{{photos.length}}">
+             <span class="auxiliary">{{photos.length}} photos</span>
+          </template>
+        </h1>
+      </section>
+      <search-box></search-box>
+    </header>
 
     <template is="dom-if" if="{{photos.length}}">
-      <div>Here is your album. Delete any photos you don't like. Select them and click delete. </div>
-      <paper-button raised on-click="_deletePhotos">Delete Selected Photos</paper-button>
-      <searched-photos id="photosList" photos="{{photos}}"></searched-photos>
+      <section class="presentation-area">
+        <paper-button raised on-click="_deletePhotos" class="external-action-button">
+          <iron-icon icon="icons:delete" class="small"></iron-icon>
+          Delete Selected Photos
+        </paper-button>
+        <searched-photos id="photosList" photos="{{photos}}"></searched-photos>
+      </section>
     </template>
 
     <template is="dom-if" if="{{!photos.length}}">
-      <p> You have no photos in your album. Search for photos and add them. Use the search box above.</p>
+      <section class="empty-state layout horizontal center-center">
+        <iron-icon icon="icons:info"></iron-icon>
+        You have no photos in your album. Use the search box above to search for photos and add them.
+      </section>
     </template>
 
   </template>

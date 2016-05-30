@@ -24,25 +24,6 @@
       margin: 20px 0  ;
     }
 
-    .search-section {
-      position: relative;
-      margin-top: 24px;
-      background-color: #F6F6F6;
-      padding: 18px 0;
-    }
-
-    paper-button.add-photos {
-      position: absolute;
-      top: 18px;
-      left: 16px;
-      font-size: 12px;
-    }
-
-    paper-button.add-photos iron-icon {
-      width: 18px;
-      height: 18px;
-    }
-
     search-box {
       flex: 1;
       align-self: flex-start;
@@ -75,7 +56,10 @@
         <search-box></search-box>
       </div>
       <template is="dom-if" if="{{selectedPhotos}}">
-        <paper-button raised on-click="_goToAlbum" class="passive">Go to album</paper-button>
+        <paper-button raised on-click="_goToAlbum" class="passive">
+          <iron-icon icon="image:camera"></iron-icon>
+          My Album
+        </paper-button>
       </template>
     </section>
 
@@ -84,11 +68,11 @@
     </template>
 
     <template is="dom-if" if="{{keywords}}">
-      <section class="search-section">
+      <section class="presentation-area">
         <template is="dom-if" if="{{photos.length}}">
 
-          <paper-button raised on-click="_addPhotosToAlbum" class="primary add-photos">
-            <iron-icon icon="icons:add"></iron-icon>
+          <paper-button raised on-click="_addPhotosToAlbum" class="primary external-action-button">
+            <iron-icon icon="icons:add" class="small"></iron-icon>
             Add Photos to Album
           </paper-button>
 
