@@ -32,12 +32,16 @@
     .tool-box {
       align-items: center;
     }
+
+    locations-list {
+      margin-top: 20px;
+    }
   </style>
 
   <template>
 
-    <iron-localstorage name="selected-photos"
-      value="{{selectedPhotos}}"
+    <iron-localstorage name="album"
+      value="{{album}}" id="localStorage"
     ></iron-localstorage>
 
     <iron-ajax
@@ -55,37 +59,45 @@
       <div class="flex-1">
         <search-box></search-box>
       </div>
-      <template is="dom-if" if="{{selectedPhotos}}">
+      <template is="dom-if" if="{{album.photos}}">
         <paper-button raised on-click="_goToAlbum" class="passive">
           <iron-icon icon="image:camera"></iron-icon>
-          My Album
+          {{album.name}}
         </paper-button>
       </template>
     </section>
 
     <template is="dom-if" if="{{locations.length}}">
-      <locations-list locations={{locations}}></locations-list>
+      <locations-list locations={{locations}} class="layout horizontal center-center"></locations-list>
     </template>
 
     <template is="dom-if" if="{{keywords}}">
-      <section class="presentation-area">
         <template is="dom-if" if="{{photos.length}}">
+          <section class="presentation-area">
+            <paper-button raised on-click="_addPhotosToAlbum" class="primary external-action-button">
+              <iron-icon icon="icons:add" class="small"></iron-icon>
+              Add Photos to Album
+            </paper-button>
 
-          <paper-button raised on-click="_addPhotosToAlbum" class="primary external-action-button">
-            <iron-icon icon="icons:add" class="small"></iron-icon>
-            Add Photos to Album
-          </paper-button>
+            <searched-photos id="searchedPhotos" photos="{{photos}}"></searched-photos>
 
-          <searched-photos id="searchedPhotos" photos="{{photos}}"></searched-photos>
-
-          <template is="dom-if" if="{{areThereMorePagesToLoad}}">
-            <div class="layout horizontal center-center">
-              <paper-button raised on-click="_loadMorePhotos" class="load-more passive">Load more ...</paper-button>
-            </div>
-          </template>
-
+            <template is="dom-if" if="{{areThereMorePagesToLoad}}">
+              <div class="layout horizontal center-center">
+                <paper-button raised on-click="_loadMorePhotos" class="load-more passive">Load more ...</paper-button>
+              </div>
+            </template>
+         </section>
         </template>
-      </section>
+
+        <template is="dom-if" if="{{!photos.length}}">
+          <template is="dom-if" if="{{!locations.length}}">
+            <section class="empty-state  horizontal layout center-center">
+              <iron-icon icon="icons:info" class="small"></iron-icon>
+              Sorry, no images were found for the search. Please try something else.
+            </section>
+          </template>
+        </template>
+
     </template>
   </template>
   <script>
@@ -107,9 +119,9 @@
           value: [],
           notify: true
         },
-        selectedPhotos: {
-          type: Array,
-          value: []
+        album: {
+          type: Object,
+          value: {}
         },
         currentPage: {
           type: Number,
@@ -151,19 +163,19 @@
       // If the keywords provided is a valid address/geographic location
       // pick up images from the corresponding lat and long.
       // If not fetch images for the keywords.
-      getPhotosFromFlickr: function(lat, long) {
+      getPhotosFromFlickr: function(lat, lng) {
         if (this.keywords) {
           var keywords = decodeURIComponent(this.keywords);
           var params = {
             method: 'flickr.photos.search',
-            api_key: '0daed8ce23060668fa0d55c247019c00',
+            api_key: 'ee53119fe0a002007ec0295663ef5286',
             format: 'json',
             nojsoncallback: 1,
             page: this.currentPage
           };
-          if (lat && long) {
+          if (lat && lng) {
             params.lat = lat;
-            params.lng = lng;
+            params.lon = lng;
           } else {
             params.tags = keywords;
           }
@@ -181,7 +193,7 @@
           // iron-request is not doing anything with params object, even though it should be.
           // hence manually building the query string. Todo(send a PR to iron-request.html)
           var requestObj = {
-            url: 'https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDgAkhTXjPX0JuZyvsNska5YJPcIL48zMc&address=' + encodeURIComponent(this.keywords),
+            url: 'https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDgAkhTXjPX0JuZyvsNska5YJPcIL48zMc&address="' + encodeURIComponent(this.keywords) + '"',
           }
           return this.$.mapsApiRequest.send(requestObj);
         } else {
@@ -240,10 +252,23 @@
       },
 
       _addPhotosToAlbum: function() {
-        if (!this.selectedPhotos) {
-          this.selectedPhotos = [];
+        var album = this.album;
+
+        if (!this.album) {
+          album = {
+            name: 'My album',
+            photos: []
+          }
         }
-        this.set('selectedPhotos', this.selectedPhotos.concat(this.querySelector('#searchedPhotos').selectedPhotos));
+
+        if (this.album && !this.album.photos) {
+          album.photos = [];
+        }
+
+        album.photos = album.photos.concat(this.querySelector('#searchedPhotos').selectedPhotos);
+
+        this.set('album', album);
+        this.$.localStorage.save();
         this.goToAlbum();
       },
 

@@ -18,8 +18,8 @@
   <template>
     <paper-button raised on-click="_goToAlbumPage" class="layout vertical center-center album">
       <iron-icon icon="image:camera"></iron-icon>
-      <div class="num-photos">{{photos.length}} photos</div>
-      My Album
+      <div class="num-photos">{{album.photos.length}} photos</div>
+      {{album.name}}
     </paper-button>
   </template>
   <script>
@@ -30,7 +30,7 @@
       is: 'album-button',
 
       properties: {
-        photos: Array
+        album: Object
       },
 
       _goToAlbumPage: function() {

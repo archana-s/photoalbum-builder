@@ -11,33 +11,33 @@
     }
   </style>
   <template>
-    <iron-localstorage name="selected-photos" id="localStorage"
-      value="{{photos}}"
+    <iron-localstorage name="album" id="localStorage"
+      value="{{album}}"
     ></iron-localstorage>
 
     <header class="layout horizontal">
       <section class="title-section">
         <h1>
-          <div contenteditable="=true">My album</div>
-          <template is="dom-if" if="{{photos.length}}">
-             <span class="auxiliary">{{photos.length}} photos</span>
+          <div contenteditable="true" on-blur="_nameChanged" id="albumName">{{album.name}}</div>
+          <template is="dom-if" if="{{album.photos.length}}">
+             <span class="auxiliary">{{album.photos.length}} photos</span>
           </template>
         </h1>
       </section>
       <search-box></search-box>
     </header>
 
-    <template is="dom-if" if="{{photos.length}}">
+    <template is="dom-if" if="{{album.photos.length}}">
       <section class="presentation-area">
         <paper-button raised on-click="_deletePhotos" class="external-action-button">
           <iron-icon icon="icons:delete" class="small"></iron-icon>
           Delete Selected Photos
         </paper-button>
-        <searched-photos id="photosList" photos="{{photos}}"></searched-photos>
+        <searched-photos id="photosList" photos="{{album.photos}}"></searched-photos>
       </section>
     </template>
 
-    <template is="dom-if" if="{{!photos.length}}">
+    <template is="dom-if" if="{{!album.photos.length}}">
       <section class="empty-state layout horizontal center-center">
         <iron-icon icon="icons:info"></iron-icon>
         You have no photos in your album. Use the search box above to search for photos and add them.
@@ -52,9 +52,8 @@
     Polymer({
       is: 'viv-album',
       properties: {
-        photos: {
-          type: Array,
-          value: 0,
+        album: {
+          type: Object,
           notify: true
         }
       },
@@ -65,7 +64,7 @@
           return photo.id;
         });
 
-        var photos = JSON.parse(JSON.stringify(this.photos));
+        var photos = JSON.parse(JSON.stringify(this.album.photos));
 
         for(var i=photos.length-1; i >= 0; i--) {
           if (photoIdsSelectedForDeletion.indexOf(photos[i].id) >= 0) {
@@ -73,9 +72,20 @@
           }
         }
 
-        this.set('photos', photos);
+        var album = {
+          name: this.album.name,
+          photos: photos
+        };
+
+        this.set('album', album);
         this.$.localStorage.save();
       },
+
+      _nameChanged: function() {
+        this.album.name = this.querySelector('#albumName').textContent;
+        this.set('album', this.album);
+        this.$.localStorage.save();
+      }
 
     });
   })();

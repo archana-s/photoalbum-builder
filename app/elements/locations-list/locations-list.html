@@ -2,17 +2,28 @@
 
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
 
 <dom-module id="locations-list">
+  <style>
+    paper-card {
+      padding: 18px 24px;
+    }
+  </style>
   <template>
-    <h3>Do you want to search by any of these locations? </h3>
-    <paper-menu id="locationMenu">
-      <template is="dom-repeat" items="{{locations}}" as="location">
-        <paper-item>{{location.formatted_address}}</paper-item>
-      </template>
-    </paper-menu>
-    <paper-button on-click="_getLocation">Choose</paper-button>
-    <paper-button on-click="_cancelLocation">Cancel</paper-button>
+    <paper-card title="Choose Location">
+      <h3>Do you want to search by any of these locations? </h3>
+      <paper-menu id="locationMenu">
+        <template is="dom-repeat" items="{{locations}}" as="location">
+          <paper-item>{{location.formatted_address}}</paper-item>
+        </template>
+      </paper-menu>
+      <section class="layout horizontal end-justified">
+        <paper-button on-click="_cancelLocation" class="passive">Cancel</paper-button>
+        <paper-button on-click="_getLocation" class="primary">Choose</paper-button>
+      </section>
+    </paper-card>
+
   </template>
 
   <script>

@@ -8,16 +8,16 @@
   </style>
   <template>
 
-    <iron-localstorage name="selected-photos" id="localStorage"
-      value="{{photos}}"
+    <iron-localstorage name="album" id="localStorage"
+      value="{{album}}"
     ></iron-localstorage>
 
     <main class="layout">
-      <template is="dom-if" if="{{!photos}}">
+      <template is="dom-if" if="{{!album}}">
         <album-builder-button></album-builder-button>
       </template>
-      <template is="dom-if" if="{{photos}}">
-        <album-button photos="{{photos}}"></album-button>
+      <template is="dom-if" if="{{album}}">
+        <album-button album="{{album}}"></album-button>
       </template>
     </main>
   </template>
@@ -28,7 +28,7 @@
     Polymer({
       is: 'viv-home',
       properties: {
-        photos: Array
+        album: Object
       }
     });
   })();

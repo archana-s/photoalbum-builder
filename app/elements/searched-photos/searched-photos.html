@@ -57,17 +57,17 @@
           Clear All Selections
         </paper-button>
       </section>
-    </template>
 
-    <ul id="photosList" class="layout horizontal center-center wrap" on-click="_handlePhotoSelection">
-      <template is="dom-repeat" items="{{photos}}" as="photo">
-        <li>
-          <input type="checkbox" data-id="{{fetchImageUrl(photo)}}" id="{{photo.id}}">
-            <img src="{{fetchImageUrl(photo)}}">
-          </input>
-        </li>
-      </template>
-    </ul>
+      <ul id="photosList" class="layout horizontal center-center wrap" on-click="_handlePhotoSelection">
+        <template is="dom-repeat" items="{{photos}}" as="photo">
+          <li>
+            <input type="checkbox" data-id="{{fetchImageUrl(photo)}}" id="{{photo.id}}">
+              <img src="{{fetchImageUrl(photo)}}">
+            </input>
+          </li>
+        </template>
+      </ul>
+    </template>
 
   </template>
   <script>
