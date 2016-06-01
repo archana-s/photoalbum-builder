@@ -2,7 +2,7 @@
 
 <link rel="import" href="../utils/custom-validator.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/image-icons.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 
@@ -23,14 +23,12 @@
   </style>
 
   <template>
-
     <section class="layout horizontal" class="search-box">
       <custom-validator id="isSearchValid" validator-name="_searchValidator"></custom-validator>
-      <paper-input auto-validate label="Search by tags or location"
+      <paper-input auto-validate label="Search by tags or location" on-keydown="_inputKeyDown"
         id="searchInput" validator="_searchValidator" error_message="Invalid search entry"></paper-input>
       <paper-icon-button raised on-click="_searchForKeywords" icon="icons:search" class="passive"></paper-icon-button>
     </section>
-
   </template>
   <script>
   (function() {
@@ -52,6 +50,13 @@
         // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
         window.location.reload();
       },
+
+      _inputKeyDown: function(evt) {
+        if(evt.keyCode === 13) {
+          // Enter key
+          this._searchForKeywords();
+        }
+      }
     });
   })();
   </script>

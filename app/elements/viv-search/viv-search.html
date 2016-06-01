@@ -60,7 +60,7 @@
         <search-box></search-box>
       </div>
       <template is="dom-if" if="{{album.photos}}">
-        <paper-button raised on-click="_goToAlbum" class="passive">
+        <paper-button noink raised on-click="_goToAlbum" class="passive">
           <iron-icon icon="image:camera"></iron-icon>
           {{album.name}}
         </paper-button>
@@ -278,7 +278,8 @@
       },
 
       _goToAlbum: function() {
-        if (this.querySelector('#searchedPhotos').selectedPhotos.length) {
+        var photosList = this.querySelector('#searchedPhotos');
+        if (photosList && photosList.selectedPhotos && photosList.selectedPhotos.length) {
           var warning = `You have some images selected. If you move without adding them,
             they will not be added to your album. Are you sure you want to move to album?`;
           if (window.confirm(warning)) {
