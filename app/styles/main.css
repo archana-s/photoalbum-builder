@@ -34,6 +34,11 @@ ul, li {
   margin: 0;
 }
 
+label {
+  color: #555;
+  font-size: 13px;
+}
+
 main {
   margin: 12px 24px;
 }

@@ -40,6 +40,11 @@
 
     .action-box {
       margin-right: 24px;
+      align-items: center;
+    }
+
+    .action-box label {
+      margin-right: 12px;
     }
 
   </style>
@@ -48,6 +53,7 @@
 
     <template is="dom-if" if="{{photos.length}}">
       <section class="horizontal layout end-justified action-box">
+        <label>{{photos.length}} photos</label>
         <paper-button raised on-click="_selectAllPhotos" class="secondary">
           <iron-icon icon="image:collections"></iron-icon>
           Select All

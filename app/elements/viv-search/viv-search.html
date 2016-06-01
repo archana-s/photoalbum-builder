@@ -6,7 +6,6 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-request.html">
 <link rel="import" href="../search-box/search-box.html">
-<link rel="import" href="../locations-list/locations-list.html">
 
 <dom-module id="viv-search">
   <style>
@@ -33,9 +32,6 @@
       align-items: center;
     }
 
-    locations-list {
-      margin-top: 20px;
-    }
   </style>
 
   <template>
@@ -53,8 +49,6 @@
       on-error="_handleError"
       last-response="{{response}}"></iron-ajax>
 
-    <iron-request id="mapsApiRequest"></iron-request>
-
     <section class="tool-box layout horizontal wrap">
       <div class="flex-1">
         <search-box></search-box>
@@ -67,38 +61,30 @@
       </template>
     </section>
 
-    <template is="dom-if" if="{{locations.length}}">
-      <locations-list locations={{locations}} class="layout horizontal center-center"></locations-list>
+    <template is="dom-if" if="{{photos.length}}">
+      <section class="presentation-area">
+        <paper-button raised on-click="_addPhotosToAlbum" class="primary external-action-button">
+          <iron-icon icon="icons:add" class="small"></iron-icon>
+          Add Photos to Album
+        </paper-button>
+
+        <searched-photos id="searchedPhotos" photos="{{photos}}"></searched-photos>
+
+        <template is="dom-if" if="{{areThereMorePagesToLoad}}">
+          <div class="layout horizontal center-center">
+            <paper-button raised on-click="_loadMorePhotos" class="load-more passive">Load more ...</paper-button>
+          </div>
+        </template>
+     </section>
     </template>
 
-    <template is="dom-if" if="{{keywords}}">
-        <template is="dom-if" if="{{photos.length}}">
-          <section class="presentation-area">
-            <paper-button raised on-click="_addPhotosToAlbum" class="primary external-action-button">
-              <iron-icon icon="icons:add" class="small"></iron-icon>
-              Add Photos to Album
-            </paper-button>
-
-            <searched-photos id="searchedPhotos" photos="{{photos}}"></searched-photos>
-
-            <template is="dom-if" if="{{areThereMorePagesToLoad}}">
-              <div class="layout horizontal center-center">
-                <paper-button raised on-click="_loadMorePhotos" class="load-more passive">Load more ...</paper-button>
-              </div>
-            </template>
-         </section>
-        </template>
-
-        <template is="dom-if" if="{{!photos.length}}">
-          <template is="dom-if" if="{{!locations.length}}">
-            <section class="empty-state  horizontal layout center-center">
-              <iron-icon icon="icons:info" class="small"></iron-icon>
-              Sorry, no images were found for the search. Please try something else.
-            </section>
-          </template>
-        </template>
-
+    <template is="dom-if" if="{{isNoPhotosFound}}">
+      <section class="empty-state  horizontal layout center-center">
+        <iron-icon icon="icons:info" class="small"></iron-icon>
+        Sorry, no images were found for the search. Please try something else.
+      </section>
     </template>
+
   </template>
   <script>
   (function() {
@@ -112,6 +98,10 @@
           type: String,
           value: '',
           observer: '_keywordsChanged'
+        },
+        latlng: {
+          type: String,
+          observer: '_latlngChanged'
         },
         photos: {
           type: Array,
@@ -136,69 +126,32 @@
           value: null,
           observer: "_responseChanged"
         },
-        areThereMorePagesToLoad: false,
-        locations: {
-          type: Array,
-          value: [],
-          notify: true
-        }
-      },
-
-      ready: function() {
-        this.setUpEventListeners();
-      },
-
-      setUpEventListeners: function() {
-        this.addEventListener('location:chosen', function(data) {
-          var result = data.detail;
-          this.getPhotosFromFlickr(result.lat, result.lng);
-          this.set('locations', []);
-        });
-        this.addEventListener('location:cancelled', function() {
-          this.getPhotosFromFlickr();
-          this.set('locations', []);
-        });
+        isNoPhotosFound: false,
+        areThereMorePagesToLoad: false
       },
 
       // If the keywords provided is a valid address/geographic location
       // pick up images from the corresponding lat and long.
       // If not fetch images for the keywords.
-      getPhotosFromFlickr: function(lat, lng) {
-        if (this.keywords) {
-          var keywords = decodeURIComponent(this.keywords);
-          var params = {
-            method: 'flickr.photos.search',
-            api_key: 'ee53119fe0a002007ec0295663ef5286',
-            format: 'json',
-            nojsoncallback: 1,
-            page: this.currentPage
-          };
-          if (lat && lng) {
-            params.lat = lat;
-            params.lon = lng;
-          } else {
-            params.tags = keywords;
-          }
-          this.$.ajaxRequest.params = params;
-          this.$.ajaxRequest.generateRequest();
-        }
-      },
+      getPhotosFromFlickr: function() {
+        var params = {
+          method: 'flickr.photos.search',
+          api_key: 'ae5c1da80ad14208768b6c79a7de337b',
+          format: 'json',
+          nojsoncallback: 1,
+          page: this.currentPage
+        };
 
-      // Invokes a google maps api call to check if the entered keywords
-      // correspond to a location.
-      // If they do, the result data will not be empty.
-      // This returns a promise from iron-request.
-      getLatLongFromMaps: function() {
-        if (this.keywords) {
-          // iron-request is not doing anything with params object, even though it should be.
-          // hence manually building the query string. Todo(send a PR to iron-request.html)
-          var requestObj = {
-            url: 'https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDgAkhTXjPX0JuZyvsNska5YJPcIL48zMc&address="' + encodeURIComponent(this.keywords) + '"',
-          }
-          return this.$.mapsApiRequest.send(requestObj);
-        } else {
-          return null;
+        if (this.latlng) {
+          var geometry = this.latlng.split('~');
+          params.lat = geometry[0];
+          params.lon = geometry[1];
+        } else if (this.keywords) {
+          params.tags = decodeURIComponent(this.keywords);
         }
+
+        this.$.ajaxRequest.params = params;
+        this.$.ajaxRequest.generateRequest();
       },
 
       resetCounters: function() {
@@ -208,21 +161,15 @@
 
       _keywordsChanged: function() {
         this.resetCounters();
-        // Try to check if the keywors typed is actually a location.
-        var mapsApiResponse = this.getLatLongFromMaps();
-        if (mapsApiResponse) {
-          mapsApiResponse.then(function(response) {
-            var mapsResult = JSON.parse(response.response);
-            if(mapsResult.results.length) {
-              this.set('locations', mapsResult.results);
-              // Check if they meant any of these places.
-              // If so, pull it using lat long, if not just pull using tagnames.
-            } else {
-              this.getPhotosFromFlickr();
-            }
-          }.bind(this), function(err) {
-            this.getPhotosFromFlickr();
-          }.bind(this));
+        if (this.keywords) {
+          this.getPhotosFromFlickr();
+        }
+      },
+
+      _latlngChanged: function() {
+        this.resetCounters();
+        if (this.latlng) {
+          this.getPhotosFromFlickr();
         }
       },
 
@@ -236,10 +183,17 @@
       },
 
       _responseChanged: function() {
-        if (this.response && this.response.photos && typeof this.response.photos === 'object') {
-          this.maxPages = this.response.photos.pages;
-          this.areThereMorePagesToLoad = this.currentPage < this.maxPages;
-          this.set('photos', this.photos.concat(this.response.photos.photo));
+        if (this.keywords || this.latlng) {
+          if (this.response && this.response.photos && typeof this.response.photos === 'object') {
+            if (this.response.photos.photo.length) {
+              this.maxPages = this.response.photos.pages;
+              this.areThereMorePagesToLoad = this.currentPage < this.maxPages;
+              this.set('photos', this.photos.concat(this.response.photos.photo));
+              this.isNoPhotosFound = false;
+            } else {
+              this.isNoPhotosFound = true;
+            }
+          }
         }
       },
 
