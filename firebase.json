@@ -1,5 +1,5 @@
 {
-  "firebase": "test-crud-app",
+  "firebase": "viv-project",
   "public": "dist",
   "ignore": [
     "firebase.json",
