@@ -10,8 +10,9 @@
       max-height: 400px;
       width: 500px;
     }
+
     .album {
-      background-color: #FAFAFA;
+      margin-top: 10px;
       padding: 20px;
     }
 
@@ -19,8 +20,9 @@
       max-width: 200px;
       margin-top: 10px;
     }
+
     .photo-info {
-      align-items: flex-end;
+      align-items: center;
     }
   </style>
   <template>
@@ -36,12 +38,15 @@
       <template is="dom-if" if="{{areTherePhotos}}">
         <section class="horizontal layout center-center album">
           <paper-icon-button icon="icons:chevron-left" on-click="_goBack"></paper-icon-button>
-          <div class="photo-info vertical layout">
+          <div class="vertical layout">
             <img src="{{currentPhoto}}" />
-            <paper-button class="passive delete-button" on-click="_deletePhoto">
-              <iron-icon icon="icons:delete"></iron-icon>
-              Delete photo
-            </paper-button>
+            <div class="photo-info horizontal layout justified">
+              <label>Date added: {{getCreatedDate()}}</label>
+              <paper-button class="passive delete-button" on-click="_deletePhoto">
+                <iron-icon icon="icons:delete"></iron-icon>
+                Delete photo
+              </paper-button>
+            </div>
           </div>
           <paper-icon-button icon="icons:chevron-right" on-click="_goForward"></paper-icon-button>
         </section>
@@ -75,7 +80,7 @@
           notify: true
         },
         currentPhoto: {
-          type: Object,
+          type: String,
           notify: true
         },
         areTherePhotos: false
@@ -87,6 +92,10 @@
 
       detached: function() {
         document.removeEventListener('keydown', this._attachKeyEvents);
+      },
+
+      getCreatedDate: function() {
+        return this.album.photos[this.currentPhotoIdx].dateAdded;
       },
 
       _attachKeyEvents: function(evt) {
@@ -121,15 +130,17 @@
       },
 
       _albumChanged: function() {
-        if (!this.album.photos.length) {
-          this.currentPhotoIdx = -1;
-          this.areTherePhotos = false;
-        } else if (this.currentPhotoIdx < 0) {
-          this.currentPhotoIdx = 0;
-          this.currentPhoto = this.getPhotoUrl();
-          this.areTherePhotos = true;
-        } else {
-          this.currentPhoto = this.getPhotoUrl();
+        if (this.album) {
+          if (this.album.photos && !this.album.photos.length) {
+            this.currentPhotoIdx = -1;
+            this.areTherePhotos = false;
+          } else if (this.currentPhotoIdx < 0) {
+            this.currentPhotoIdx = 0;
+            this.currentPhoto = this.getPhotoUrl();
+            this.areTherePhotos = true;
+          } else {
+            this.currentPhoto = this.getPhotoUrl();
+          }
         }
       },
 

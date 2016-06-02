@@ -134,7 +134,7 @@
       getPhotosFromFlickr: function() {
         var params = {
           method: 'flickr.photos.search',
-          api_key: 'd332527aa9fd2b864ce83813c5ca32f1',
+          api_key: 'a84413e1839b9b69144162c49cfaffc8',
           format: 'json',
           nojsoncallback: 1,
           page: this.currentPage
@@ -203,14 +203,29 @@
         window.location.reload();
       },
 
+      formatDate: function(date) {
+        return `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`;
+      },
+
+      appendDateToPhotos: function(photos) {
+        var date = new Date();
+        photos.forEach(function(photo) {
+          photo.dateAdded = this.formatDate(date);
+        }.bind(this));
+        return photos;
+      },
+
       _addPhotosToAlbum: function() {
         var photosListElem = this.querySelector('#searchedPhotos');
+        var photos = this.appendDateToPhotos(photosListElem.selectedPhotos);
         var album = this.album;
 
         if (!this.album) {
+          var date = new Date();
           album = {
             name: 'My album',
-            photos: []
+            photos: [],
+            dateCreated: this.formatDate(date)
           }
         }
 
@@ -218,7 +233,7 @@
           album.photos = [];
         }
 
-        album.photos = album.photos.concat(photosListElem.selectedPhotos);
+        album.photos = album.photos.concat(photos);
 
         this.set('album', album);
         this.$.localStorage.save();
