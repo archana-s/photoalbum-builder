@@ -140,8 +140,13 @@
           photos.splice(this.currentPhotoIdx, 1);
           var album = {
             photos: photos,
-            name: this.album.name
           };
+
+          Object.keys(this.album).forEach(function(key) {
+            if (key !== 'photos') {
+              album[key] = this.album[key];
+            }
+          }.bind(this));
 
           this.set('album', album);
           this.$.localStorage.save();

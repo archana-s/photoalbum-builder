@@ -54,6 +54,10 @@
       margin-right: 12px;
     }
 
+    img {
+      cursor: pointer;
+    }
+
   </style>
 
   <template>
@@ -102,6 +106,14 @@
           notify: true,
           observer: '_selectedPhotosChanged'
         }
+      },
+
+      attached: function() {
+        this.addEventListener('selections:complete', this._unselectAllPhotos);
+      },
+
+      detached: function() {
+        this.removeEventListener('selections:complete', this._unselectAllPhotos);
       },
 
       fetchImageUrl: function(photo) {

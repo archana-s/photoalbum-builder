@@ -81,7 +81,8 @@
       },
 
       _deletePhotos: function() {
-        var photosSelectedForDeletion = this.querySelector('#photosList').selectedPhotos;
+        var photosListElem = this.querySelector('#photosList')
+        var photosSelectedForDeletion = photosListElem.selectedPhotos;
         var photoIdsSelectedForDeletion = photosSelectedForDeletion.map(function(photo) {
           return photo.id;
         });
@@ -100,6 +101,7 @@
         };
 
         this.set('album', album);
+        photosListElem.fire('selections:complete');
         this.$.localStorage.save();
       },
 

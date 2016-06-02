@@ -204,6 +204,7 @@
       },
 
       _addPhotosToAlbum: function() {
+        var photosListElem = this.querySelector('#searchedPhotos');
         var album = this.album;
 
         if (!this.album) {
@@ -217,10 +218,11 @@
           album.photos = [];
         }
 
-        album.photos = album.photos.concat(this.querySelector('#searchedPhotos').selectedPhotos);
+        album.photos = album.photos.concat(photosListElem.selectedPhotos);
 
         this.set('album', album);
         this.$.localStorage.save();
+        photosListElem.fire('selections:complete');
         this.goToAlbum();
       },
 
