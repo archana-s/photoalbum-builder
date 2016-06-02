@@ -19,6 +19,9 @@
       position: absolute;
       bottom: 0;
       right: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
     }
 
     input[type="checkbox"]:not(:checked) {
@@ -71,9 +74,8 @@
       <ul id="photosList" class="layout horizontal center-center wrap" on-click="_handlePhotoSelection">
         <template is="dom-repeat" items="{{photos}}" as="photo">
           <li>
-            <input type="checkbox" data-id="{{fetchImageUrl(photo)}}" id="{{photo.id}}">
-              <img src="{{fetchImageUrl(photo)}}">
-            </input>
+            <input type="checkbox" data-id="{{fetchImageUrl(photo)}}" id="{{photo.id}}" />
+            <img src="{{fetchImageUrl(photo)}}">
           </li>
         </template>
       </ul>
@@ -116,11 +118,14 @@
       },
 
       _handlePhotoSelection: function(evt) {
-        if (evt.target.nodeName.toLowerCase() === 'input') {
-          var photoId = evt.target.id;
+        if (evt.target.nodeName.toLowerCase() === 'img') {
+          var target = evt.target.parentNode.querySelector('input');
+          target.checked = !target.checked;
+
+          var photoId = target.id;
           var photo = this.fetchPhotoForId(photoId);
 
-          if (evt.target.checked) {
+          if (target.checked) {
             this.selectedPhotos.push(photo);
           } else {
             var removeIndex = this.selectedPhotos.indexOf(photo);
@@ -141,7 +146,6 @@
 
       _selectAllPhotos: function() {
         this.selectedPhotos = this.photos;
-        // this.set('selectedPhotos', this.photos);
         Array.prototype.slice.apply(this.querySelectorAll('input[type="checkbox"]')).forEach(function(node) {
           node.checked = true;
         });
