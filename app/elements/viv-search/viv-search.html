@@ -6,6 +6,7 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-request.html">
 <link rel="import" href="../search-box/search-box.html">
+<link rel="import" href="../album-button-small/album-button-small.html">
 
 <dom-module id="viv-search">
   <style>
@@ -54,10 +55,7 @@
         <search-box></search-box>
       </div>
       <template is="dom-if" if="{{album.photos}}">
-        <paper-button noink raised on-click="_goToAlbum" class="passive">
-          <iron-icon icon="image:camera"></iron-icon>
-          {{album.name}}
-        </paper-button>
+        <album-button-small name="{{album.name}}"></album-button-small>
       </template>
     </section>
 
@@ -136,7 +134,7 @@
       getPhotosFromFlickr: function() {
         var params = {
           method: 'flickr.photos.search',
-          api_key: 'ae5c1da80ad14208768b6c79a7de337b',
+          api_key: 'd332527aa9fd2b864ce83813c5ca32f1',
           format: 'json',
           nojsoncallback: 1,
           page: this.currentPage
@@ -234,8 +232,8 @@
       _goToAlbum: function() {
         var photosList = this.querySelector('#searchedPhotos');
         if (photosList && photosList.selectedPhotos && photosList.selectedPhotos.length) {
-          var warning = `You have some images selected. If you move without adding them,
-            they will not be added to your album. Are you sure you want to move to album?`;
+          var warning = 'You have some images selected. If you move without adding them,\
+            they will not be added to your album. Are you sure you want to move to album?';
           if (window.confirm(warning)) {
             this.goToAlbum();
           }

@@ -41,20 +41,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.scrollPageToTop();
     });
 
-    page('/user/:name', function(data) {
-      app.route = 'user-welcome';
-      app.params = data.params;
-      app.scrollPageToTop();
-    });
-
-    page('/admin', function() {
-      app.route = 'admin';
-      app.scrollPageToTop();
-    });
-
-    page('/admin/:userid', function(data) {
-      app.route = 'user-edit';
-      app.params = data.params;
+    page('/gallery', function() {
+      app.route = 'gallery';
       app.scrollPageToTop();
     });
 

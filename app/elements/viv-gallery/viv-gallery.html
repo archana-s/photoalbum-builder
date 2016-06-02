@@ -1,0 +1,154 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../album-button-small/album-button-small.html">
+
+<dom-module id="viv-gallery">
+  <style>
+    img {
+      max-height: 400px;
+      width: 500px;
+    }
+    .album {
+      background-color: #FAFAFA;
+      padding: 20px;
+    }
+
+    .delete-button {
+      max-width: 200px;
+      margin-top: 10px;
+    }
+    .photo-info {
+      align-items: flex-end;
+    }
+  </style>
+  <template>
+    <iron-localstorage name="album" id="localStorage"
+      value="{{album}}"
+    ></iron-localstorage>
+
+    <main>
+      <div class="info horizontal layout end-justified">
+        <album-button-small name={{album.name}}></album-button-small>
+      </div>
+
+      <template is="dom-if" if="{{areTherePhotos}}">
+        <section class="horizontal layout center-center album">
+          <paper-icon-button icon="icons:chevron-left" on-click="_goBack"></paper-icon-button>
+          <div class="photo-info vertical layout">
+            <img src="{{currentPhoto}}" />
+            <paper-button class="passive delete-button" on-click="_deletePhoto">
+              <iron-icon icon="icons:delete"></iron-icon>
+              Delete photo
+            </paper-button>
+          </div>
+          <paper-icon-button icon="icons:chevron-right" on-click="_goForward"></paper-icon-button>
+        </section>
+      </template>
+
+      <template is="dom-if" if="{{!areTherePhotos}}">
+        <section class="empty-state  horizontal layout center-center">
+          <iron-icon icon="icons:info" class="small"></iron-icon>
+          Add images and fill this album!
+        </section>
+      </template>
+
+    </main>
+
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'viv-gallery',
+      properties: {
+        album: {
+          type: Object,
+          notify: true,
+          observer: '_albumChanged'
+        },
+        currentPhotoIdx: {
+          type: Number,
+          value: -1,
+          notify: true
+        },
+        currentPhoto: {
+          type: Object,
+          notify: true
+        },
+        areTherePhotos: false
+      },
+
+      attached: function() {
+        document.addEventListener('keydown', this._attachKeyEvents.bind(this));
+      },
+
+      detached: function() {
+        document.removeEventListener('keydown', this._attachKeyEvents);
+      },
+
+      _attachKeyEvents: function(evt) {
+        var RIGHT = 39;
+        var LEFT = 37;
+        if (evt.keyCode === LEFT) {
+          this._goBack();
+        } else if (evt.keyCode === RIGHT){
+          this._goForward();
+        }
+      },
+
+      getPhotoUrl: function() {
+        if (this.album.photos && this.album.photos.length) {
+          var photo = this.album.photos[this.currentPhotoIdx];
+          return `http://c2.staticflickr.com/${photo.farm}/${photo.server}/${photo.id}_${photo.secret}_c.jpg`;
+        }
+      },
+
+      _goBack: function() {
+        if (this.currentPhotoIdx - 1 >= 0) {
+          this.currentPhotoIdx--;
+          this.currentPhoto = this.getPhotoUrl();
+        }
+      },
+
+      _goForward: function() {
+        if (this.currentPhotoIdx + 1 < this.album.photos.length) {
+          this.currentPhotoIdx ++;
+          this.currentPhoto = this.getPhotoUrl();
+        }
+      },
+
+      _albumChanged: function() {
+        if (!this.album.photos.length) {
+          this.currentPhotoIdx = -1;
+          this.areTherePhotos = false;
+        } else if (this.currentPhotoIdx < 0) {
+          this.currentPhotoIdx = 0;
+          this.currentPhoto = this.getPhotoUrl();
+          this.areTherePhotos = true;
+        } else {
+          this.currentPhoto = this.getPhotoUrl();
+        }
+      },
+
+      _deletePhoto: function() {
+        if (window.confirm("Are you sure you want to delete this photo?")) {
+          var photos = JSON.parse(JSON.stringify(this.album.photos));
+
+          photos.splice(this.currentPhotoIdx, 1);
+          var album = {
+            photos: photos,
+            name: this.album.name
+          };
+
+          this.set('album', album);
+          this.$.localStorage.save();
+        }
+      }
+
+    });
+  })();
+  </script>
+</dom-module>

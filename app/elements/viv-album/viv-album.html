@@ -9,13 +9,18 @@
     .title-section {
       flex: 1;
     }
-    .add-button {
+    .add-button, .gallery-button {
       height: 36px;
     }
 
-    .add-button iron-icon {
+    .add-button iron-icon, .gallery-button iron-icon {
       width: 14px;
       height: 14px;
+    }
+
+    .album-name {
+      cursor: text;
+      max-width: 300px;
     }
   </style>
   <template>
@@ -26,12 +31,18 @@
     <header class="layout horizontal">
       <section class="title-section">
         <h1>
-          <div contenteditable="true" on-blur="_nameChanged" id="albumName">{{album.name}}</div>
+          <div contenteditable="true" on-blur="_nameChanged" id="albumName" class="album-name">{{album.name}}</div>
           <template is="dom-if" if="{{album.photos.length}}">
              <span class="auxiliary">{{album.photos.length}} photos</span>
           </template>
         </h1>
       </section>
+      <template is="dom-if" if="{{album.photos.length}}">
+        <paper-button raised class="passive gallery-button" on-click="_goToGallery">
+          <iron-icon icon="image:photo-album"></iron-icon>
+          View as gallery
+        </paper-button>
+      </template>
       <paper-button raised class="passive add-button" on-click="_goToSearchPage">
         <iron-icon icon="icons:add"></iron-icon>
         Add photos
@@ -100,6 +111,14 @@
 
       _goToSearchPage: function() {
         window.location.href = '/#!/search';
+        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
+        // hence using a button with an action.
+        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
+        window.location.reload();
+      },
+
+      _goToGallery: function() {
+        window.location.href = '/#!/gallery';
         // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
         // hence using a button with an action.
         // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.

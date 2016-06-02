@@ -49,12 +49,8 @@
           <viv-album></viv-album>
         </section>
 
-        <section data-route="admin" class="layout vertical center-center">
-          <ha-admin-page></ha-admin-page>
-        </section>
-
-        <section data-route="user-edit" class="layout vertical center-center">
-          <ha-user-edit-page userid={{params.userid}}></ha-user-edit-page>
+        <section data-route="gallery">
+          <viv-gallery></viv-gallery>
         </section>
 
       </iron-pages>
@@ -62,7 +58,6 @@
   </template>
   <!-- build:js scripts/app.js -->
   <script src="scripts/app.js"></script>
-  <script src="scripts/vendor/random-id/randomID.js"></script>
   <!-- endbuild-->
 </body>
 
