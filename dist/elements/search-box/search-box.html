@@ -68,7 +68,7 @@
 
    <!-- Displays a list of potential locations for the search keyword. Displays the search keyword itself at the top -->
     <template is="dom-if" if="{{locations.length}}">
-      <paper-menu id="locationMenu" on-iron-select="_itemChosen">
+      <paper-menu id="locationMenu" on-iron-select="_itemChosen" on-keydown="_onKeyDownInLocationList">
         <paper-item class="layout horizontal">
           <div class="icon"><iron-icon icon="icons:search"></iron-icon></div>
           <div>{{keywords}}</div>
@@ -111,6 +111,23 @@
         },
         keywords: {
           type: String
+        }
+      },
+
+      checkIfAlphaNumericSpecialCharKey: function(keycode) {
+        return ((keycode > 47 && keycode < 58) || // Number keys
+          (keycode > 64 && keycode < 91)   || // letter keys
+          (keycode > 95 && keycode < 112)  || // numpad keys
+          (keycode > 185 && keycode < 193) ||  //;=,-./`
+          (keycode > 218 && keycode < 223));  // [\]'
+      },
+
+      _onKeyDownInLocationList: function(evt) {
+        var ESC = 27;
+        var isCharNumSpecialCharKey = this.checkIfAlphaNumericSpecialCharKey(evt.keyCode);
+
+        if (evt.keyCode === ESC || isCharNumSpecialCharKey) {
+          this.querySelector('#searchInput').$.input.focus();
         }
       },
 
