@@ -167,7 +167,7 @@
       getPhotoUrl: function() {
         if (this.album.photos && this.album.photos.length) {
           var photo = this.album.photos[this.currentPhotoIdx];
-          return `http://c2.staticflickr.com/${photo.farm}/${photo.server}/${photo.id}_${photo.secret}_c.jpg`;
+          return fetchFlickrImageUrlFromPhoto(photo, 'full');
         }
       },
 

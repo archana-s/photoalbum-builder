@@ -131,7 +131,7 @@
       /* Building the image url from different attributes for the photo.
        */
       fetchImageUrl: function(photo) {
-        return `http://c2.staticflickr.com/${photo.farm}/${photo.server}/${photo.id}_${photo.secret}_s.jpg`;
+        return fetchFlickrImageUrlFromPhoto(photo);
       },
 
       fetchPhotoForId: function(photoId) {
