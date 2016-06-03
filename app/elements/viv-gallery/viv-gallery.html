@@ -42,7 +42,7 @@
         <!-- If there are photos display the gallery. you have the option to go back and forward.-->
         <template is="dom-if" if="{{areTherePhotos}}">
           <section class="horizontal layout center-center album">
-            <paper-icon-button icon="icons:chevron-left" on-click="_goBack"></paper-icon-button>
+            <paper-icon-button id="backBtn" icon="icons:chevron-left" on-click="_goBack" disabled></paper-icon-button>
             <div class="vertical layout">
               <img src="{{currentPhoto}}" />
               <div class="photo-info horizontal layout justified">
@@ -53,7 +53,7 @@
                 </paper-button>
               </div>
             </div>
-            <paper-icon-button icon="icons:chevron-right" on-click="_goForward"></paper-icon-button>
+            <paper-icon-button id="nextBtn" icon="icons:chevron-right" on-click="_goForward"></paper-icon-button>
           </section>
         </template>
 
@@ -105,7 +105,8 @@
         currentPhotoIdx: {
           type: Number,
           value: -1,
-          notify: true
+          notify: true,
+          observer: '_currentPhotoIdxChanged'
         },
         currentPhoto: {
           type: String,
@@ -131,6 +132,22 @@
       /* Data binding is unable to handle this logic. So it resides as a function that returns this value */
       getCreatedDate: function() {
         return this.album.photos[this.currentPhotoIdx].dateAdded;
+      },
+
+      _currentPhotoIdxChanged: function() {
+        var backBtn = this.querySelector('#backBtn');
+        var nextBtn = this.querySelector('#nextBtn');
+
+        if (backBtn && nextBtn) {
+          backBtn.disabled = false;
+          nextBtn.disabled = false;
+          if (this.currentPhotoIdx <= 0) {
+            backBtn.disabled = true;
+          }
+          if (this.currentPhotoIdx >= this.album.photos.length - 1) {
+            nextBtn.disabled = true;
+          }
+        }
       },
 
       /*
