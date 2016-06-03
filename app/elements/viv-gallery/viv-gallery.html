@@ -31,6 +31,7 @@
 
     .photo-info {
       align-items: center;
+      -webkit-align-items: center;
     }
   </style>
   <template>
@@ -54,7 +55,7 @@
             <div class="vertical layout">
               <img src="{{currentPhoto}}" />
               <div class="photo-info horizontal layout justified">
-                <label>Date added: {{getCreatedDate()}}</label>
+                <div class="label">Date added: {{getCreatedDate()}}</div>
                 <paper-button class="passive delete-button" on-click="_deletePhoto">
                   <iron-icon icon="icons:delete"></iron-icon>
                   Delete photo

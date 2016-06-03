@@ -58,6 +58,10 @@
       cursor: pointer;
     }
 
+    .label {
+      margin-right: 8px;
+    }
+
   </style>
 
   <!-- This section lists photos either from a search or in the album and helps select them for
@@ -68,7 +72,7 @@
     <template is="dom-if" if="{{photos.length}}">
       <!--Displays action and info about photos. Presents number of photos and gives you the option to select all/unselect all -->
       <section class="horizontal layout end-justified action-box wrap">
-        <label>{{photos.length}} photos</label>
+        <div class="label">{{photos.length}} photos</div>
         <paper-button raised on-click="_selectAllPhotos" class="secondary">
           <iron-icon icon="image:collections"></iron-icon>
           Select All

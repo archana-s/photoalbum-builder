@@ -8,6 +8,7 @@
   <style>
     .title-section {
       flex: 1;
+      -webkit-flex: 1;
     }
     .add-button, .gallery-button {
       height: 36px;
@@ -28,6 +29,10 @@
       min-width: 200px;
     }
 
+    .label {
+      display: inline;
+    }
+
   </style>
   <!--
     This is a page that will display your album, help add more photos, delete photos, or view the photos as a gallery
@@ -46,7 +51,7 @@
             <template is="dom-if" if="{{album.photos.length}}">
                <span class="auxiliary">{{album.photos.length}} photos</span>&nbsp;
             </template>
-            <label>Created on: {{album.dateCreated}}</label>
+            <div class="label">Created on: {{album.dateCreated}}</div>
           </h1>
         </div>
         <template is="dom-if" if="{{album.photos.length}}">
