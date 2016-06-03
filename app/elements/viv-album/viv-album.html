@@ -28,14 +28,18 @@
     }
 
   </style>
+  <!--
+    This is a page that will display your album, help add more photos, delete photos, or view the photos as a gallery
+  -->
   <template>
+    <!-- The photos for the album you create are currently stored in localStorage. This is an element for localStorage. -->
     <iron-localstorage name="album" id="localStorage"
       value="{{album}}"
     ></iron-localstorage>
 
     <template is="dom-if" if="{{album}}">
-      <header class="layout horizontal">
-        <section class="title-section">
+      <section class="layout horizontal">
+        <div class="title-section">
           <h1>
             <div contenteditable="true" on-blur="_nameChanged" id="albumName" class="album-name">{{album.name}}</div>
             <template is="dom-if" if="{{album.photos.length}}">
@@ -43,7 +47,7 @@
             </template>
             <label>Created on: {{album.dateCreated}}</label>
           </h1>
-        </section>
+        </div>
         <template is="dom-if" if="{{album.photos.length}}">
           <paper-button raised class="passive gallery-button" on-click="_goToGallery">
             <iron-icon icon="image:photo-album"></iron-icon>
@@ -54,8 +58,9 @@
           <iron-icon icon="icons:add"></iron-icon>
           Add photos
         </paper-button>
-      </header>
+      </section>
 
+      <!-- If there are any photos, display them in thumbnails and allow the option to delete any of them -->
       <template is="dom-if" if="{{album.photos.length}}">
         <section class="presentation-area">
           <paper-button raised on-click="_deletePhotos" class="external-action-button">
@@ -66,6 +71,7 @@
         </section>
       </template>
 
+      <!-- No photos in album state -->
       <template is="dom-if" if="{{!album.photos.length}}">
         <section class="empty-state layout horizontal center-center">
           <iron-icon icon="icons:info"></iron-icon>
@@ -74,10 +80,11 @@
       </template>
     </template>
 
+    <!-- No album present state -->
     <template is="dom-if" if="{{!album}}">
       <section class="empty-state horizontal layout center-center">
         <iron-icon icon="places:spa"></iron-icon>
-        404 Nothing found here.
+        404 Oops you reached here my mistake.
       </section>
     </template>
 
@@ -85,7 +92,10 @@
   <script>
   (function() {
     'use strict';
-
+    /*
+     * Properties
+     * album: this is the album that is stored in the localstorage.
+     */
     Polymer({
       is: 'viv-album',
       properties: {
@@ -96,25 +106,32 @@
       },
 
       _deletePhotos: function() {
-        var photosListElem = this.querySelector('#photosList')
+        // Step 1: Get the list of photos from the photos-list element.
+        var photosListElem = this.querySelector('#photosList');
         var photosSelectedForDeletion = photosListElem.selectedPhotos;
         var photoIdsSelectedForDeletion = photosSelectedForDeletion.map(function(photo) {
           return photo.id;
         });
 
+        // Clone the photos object. photos object is bound to the UI. hence this cloning is necessary.
         var photos = JSON.parse(JSON.stringify(this.album.photos));
 
+        // Step 2: Delete photos
+        // reverse order so splicing wont lead to weird lengths and deletions.
         for(var i=photos.length-1; i >= 0; i--) {
           if (photoIdsSelectedForDeletion.indexOf(photos[i].id) >= 0) {
             photos.splice(i, 1);
           }
         }
 
-        var album = {
-          name: this.album.name,
-          photos: photos
-        };
+        // Create a new album object and place the photos here.
+        // this is needed because editing the album object directly does not store the object.
+        // This looks like a weird localstorage and data-binding bug in Polymer.
+        var album = Object.assign({}, this.album);
+        album.photos = photos;
 
+        // Step 4: store the album. save localstorage data.
+        // clear all selections.
         this.set('album', album);
         photosListElem.fire('selections:complete');
         this.$.localStorage.save();

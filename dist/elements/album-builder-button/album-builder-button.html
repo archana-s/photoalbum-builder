@@ -1,9 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
-<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
-
 <dom-module id="album-builder-button">
   <style>
     iron-icon {
@@ -28,7 +24,8 @@
         window.location.href = '/#!/search';
         // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
         // hence using a button with an action.
-        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
+        // the routes are automatically not reloaded in this starter kit because of #!,
+        // as a result, manually triggering it.
         window.location.reload();
       }
     });

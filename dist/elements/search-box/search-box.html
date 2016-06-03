@@ -1,9 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
-<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
@@ -27,7 +24,7 @@
     }
 
     paper-menu {
-      border: 1px solid #ccc;
+      border: 1px solid #CCC;
       position: absolute;
       top: -4px;
       left: 0;
@@ -52,23 +49,23 @@
   </style>
 
   <template>
-    <iron-request id="mapsApiRequest"></iron-request>
-
+    <!-- Ajax requests can be made via polymer elements as well. iron-ajax helps with these requests -->
     <iron-ajax
       id="ajaxRequest"
       url="https://maps.googleapis.com/maps/api/geocode/json?"
       handle-as="json"
       debounce-duration="300"
-      on-response="_handleResponse"
       on-error="_handleError"
       last-response="{{mapsResult}}"></iron-ajax>
 
+    <!-- search input section -->
     <section class="layout horizontal" class="search-box">
-      <paper-input auto-validate label="Search by tags or location" on-keydown="_inputKeyDown" on-input="_updateList"
-        id="searchInput" validator="_searchValidator" error_message="Invalid search entry"></paper-input>
+      <paper-input auto-validate label="Search by tags or location" on-keydown="_inputKeyDown" on-input="_updateLocationsList"
+        id="searchInput" validator="_searchValidator" error-message="Invalid search entry"></paper-input>
       <paper-icon-button raised on-click="_searchForKeywords" icon="icons:search" class="passive"></paper-icon-button>
     </section>
 
+   <!-- Displays a list of potential locations for the search keyword. Displays the search keyword itself at the top -->
     <template is="dom-if" if="{{locations.length}}">
       <paper-menu id="locationMenu" on-iron-select="_itemChosen">
         <paper-item class="layout horizontal">
@@ -89,6 +86,16 @@
   (function() {
     'use strict';
 
+    /*
+     * Properties:
+     * 1. locations: Holds the list of locations that google maps api returns for every change in input.
+     *    this is bound to the UI.
+     * 2. mapsResult: This is the result object that comes back from making the google maps api request.
+     *    Since the observer can look for changes in the values, we don't use promises to do the next steps.
+     *    iron-ajax internally uses iron-request which uses promises.
+     * 3. keywords: The input user types. This is stored as a prop to data bind to the UI, esp the dropdown menu.
+     *    The drop down menu displays all locations and also the searched keyword to make it intuitive.
+     */
     Polymer({
       is: 'search-box',
 
@@ -109,22 +116,24 @@
       _searchForKeywords: function() {
         var keywords = encodeURIComponent(this.$.searchInput.value);
         window.location.href = `/#!/search/${keywords}`;
-        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
-        // hence using a button with an action.
         // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
         window.location.reload();
       },
 
-      _searchForLatLong: function(idx) {
+      searchForLatLong: function(idx) {
         var selectedLocation = this.locations[idx];
         var latLng = `${selectedLocation.geometry.location.lat}~${selectedLocation.geometry.location.lng}`;
         window.location.href = `/#!/search/location/${latLng}`;
-        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
-        // hence using a button with an action.
         // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
         window.location.reload();
       },
 
+      /* This method tracks any key events from the search input field.
+       * If user presses enter, immediately search for the keywords.
+       * If user pressed down arrow from here, make sure to focus on the drop down list
+       * that displays the list of locations. This helps user traverse the dropdown
+       * without mouse.
+       */
       _inputKeyDown: function(evt) {
         var DOWN = 40;
         var ENTER = 13;
@@ -139,7 +148,12 @@
         }
       },
 
-      _updateList: function() {
+      /* Whenever the input for search changes, get the list of locations
+       * that map to the input from Google maps.
+       * This way if the user is searching for a location, the dropdown list
+       * auto populates with the potential locations.
+       */
+      _updateLocationsList: function() {
         this.keywords = this.$.searchInput.value;
         if (this.keywords.length === 0) {
           this.set('locations', []);
@@ -153,6 +167,11 @@
         }
       },
 
+      /* Observer for MapsResults
+       * whenever mapsResults change, which happens whenver user input changes,
+       * this will be triggered.
+       * Set locations to the new set received from Google maps api.
+       */
       _mapsResultChanged: function() {
         this.set('locations', this.mapsResult.results);
       },
@@ -162,15 +181,14 @@
         if (selectedItemIdx === 0) {
           this._searchForKeywords();
         } else {
-          this._searchForLatLong(selectedItemIdx - 1); //This maps directly to an index in locations array
+          this.searchForLatLong(selectedItemIdx - 1); //This maps directly to an index in locations array
         }
       },
 
-      _handleError: function() {
+      _handleError: function(err) {
+        // Log error from Google maps.
+        console.log('Google maps api to fetch locations for search input failed with this message', err);
       },
-
-      _handleResponse: function() {
-      }
 
     });
   })();

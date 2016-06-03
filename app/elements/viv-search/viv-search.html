@@ -37,16 +37,17 @@
 
   <template>
 
+    <!-- Localstorage for storing and fetching the images -->
     <iron-localstorage name="album"
       value="{{album}}" id="localStorage"
     ></iron-localstorage>
 
+    <!-- Ajax call to fetch the images from flickr based on keywords or locations -->
     <iron-ajax
       id="ajaxRequest"
       url="https://api.flickr.com/services/rest/"
       handle-as="json"
       debounce-duration="300"
-      on-response="_handleResponse"
       on-error="_handleError"
       last-response="{{response}}"></iron-ajax>
 
@@ -59,6 +60,7 @@
       </template>
     </section>
 
+    <!-- List photos and have a load more section to load next page of content -->
     <template is="dom-if" if="{{photos.length}}">
       <section class="presentation-area">
         <paper-button raised on-click="_addPhotosToAlbum" class="primary external-action-button">
@@ -76,6 +78,7 @@
      </section>
     </template>
 
+    <!-- No images found state -->
     <template is="dom-if" if="{{isNoPhotosFound}}">
       <section class="empty-state  horizontal layout center-center">
         <iron-icon icon="icons:info" class="small"></iron-icon>
@@ -103,7 +106,6 @@
         },
         photos: {
           type: Array,
-          observer: '_photosChanged',
           value: [],
           notify: true
         },
@@ -140,23 +142,27 @@
           page: this.currentPage
         };
 
-        if (this.latlng) {
-          var geometry = this.latlng.split('~');
-          params.lat = geometry[0];
-          params.lon = geometry[1];
-        } else if (this.keywords) {
-          params.tags = decodeURIComponent(this.keywords);
-        }
+        if (this.latlng || this.keywords) {
+          if (this.latlng) {
+            var geometry = this.latlng.split('~');
+            params.lat = geometry[0];
+            params.lon = geometry[1];
+          } else if (this.keywords) {
+            params.tags = decodeURIComponent(this.keywords);
+          }
 
-        this.$.ajaxRequest.params = params;
-        this.$.ajaxRequest.generateRequest();
+          this.$.ajaxRequest.params = params;
+          this.$.ajaxRequest.generateRequest();
+        }
       },
 
+      // these counters are used to determine whether to display load more or not.
       resetCounters: function() {
         this.currentPage = 1;
         this.maxPages = 0;
       },
 
+      // Observer for keywords. If its changed, fetch new set of images.
       _keywordsChanged: function() {
         this.resetCounters();
         if (this.keywords) {
@@ -164,6 +170,7 @@
         }
       },
 
+      // Observer for latlng. If its changed, fetch new set of images.
       _latlngChanged: function() {
         this.resetCounters();
         if (this.latlng) {
@@ -171,13 +178,9 @@
         }
       },
 
-      _handleResponse: function(e) {
-      },
-
       _handleError: function(err) {
-      },
-
-      _photosChanged: function() {
+        // Error from flickr
+        throw {name: 'FlickrFailed', message: err};
       },
 
       _responseChanged: function() {
@@ -218,7 +221,8 @@
       _addPhotosToAlbum: function() {
         var photosListElem = this.querySelector('#searchedPhotos');
         var photos = this.appendDateToPhotos(photosListElem.selectedPhotos);
-        var album = this.album;
+
+        var album = Object.assign({}, this.album);
 
         if (!this.album) {
           var date = new Date();
