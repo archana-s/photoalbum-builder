@@ -67,7 +67,7 @@
     <!-- If else is handled through the template element. Used that instead of toggling in javascript/CSS -->
     <template is="dom-if" if="{{photos.length}}">
       <!--Displays action and info about photos. Presents number of photos and gives you the option to select all/unselect all -->
-      <section class="horizontal layout end-justified action-box">
+      <section class="horizontal layout end-justified action-box wrap">
         <label>{{photos.length}} photos</label>
         <paper-button raised on-click="_selectAllPhotos" class="secondary">
           <iron-icon icon="image:collections"></iron-icon>

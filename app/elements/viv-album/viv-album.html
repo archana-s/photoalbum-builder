@@ -25,6 +25,7 @@
 
     h1 {
       margin-bottom: 8px;
+      min-width: 200px;
     }
 
   </style>
@@ -38,7 +39,7 @@
     ></iron-localstorage>
 
     <template is="dom-if" if="{{album}}">
-      <section class="layout horizontal">
+      <section class="layout horizontal wrap">
         <div class="title-section">
           <h1>
             <div contenteditable="true" on-blur="_nameChanged" id="albumName" class="album-name">{{album.name}}</div>
@@ -128,6 +129,7 @@
         // this is needed because editing the album object directly does not store the object.
         // This looks like a weird localstorage and data-binding bug in Polymer.
         var album = Object.assign({}, this.album);
+
         album.photos = photos;
 
         // Step 4: store the album. save localstorage data.

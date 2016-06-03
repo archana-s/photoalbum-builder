@@ -12,7 +12,7 @@ var fetchFlickrImageUrlFromPhoto = function() {
   if (!photo || !typeof photo === 'object') return false;
 
   if (photo.farm && photo.server && photo.id && photo.secret) {
-    var part = `http://c2.staticflickr.com/${photo.farm}/${photo.server}/${photo.id}_${photo.secret}`;
+    var part = 'http://c2.staticflickr.com/' + photo.farm + '/' + photo.server + '/' + photo.id + '_' + photo.secret;
     if (type.toLowerCase() === 'full') {
       return part + '_c.jpg';
     }

@@ -102,6 +102,18 @@ paper-button.secondary:first-letter {
   font-size: 12px;
 }
 
+@media only screen
+  and (max-device-width: 768px) {
+  .presentation-area {
+    padding-top: 80px;
+  }
+  .presentation-area .external-action-button {
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
 iron-icon.small {
   width: 18px;
   height: 18px;
