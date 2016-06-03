@@ -8,6 +8,7 @@
   <style>
     .title-section {
       flex: 1;
+      -webkit-flex: 1;
     }
     .add-button, .gallery-button {
       height: 36px;
@@ -25,6 +26,11 @@
 
     h1 {
       margin-bottom: 8px;
+      min-width: 200px;
+    }
+
+    .label {
+      display: inline;
     }
 
   </style>
@@ -38,14 +44,14 @@
     ></iron-localstorage>
 
     <template is="dom-if" if="{{album}}">
-      <section class="layout horizontal">
+      <section class="layout horizontal wrap">
         <div class="title-section">
           <h1>
             <div contenteditable="true" on-blur="_nameChanged" id="albumName" class="album-name">{{album.name}}</div>
             <template is="dom-if" if="{{album.photos.length}}">
                <span class="auxiliary">{{album.photos.length}} photos</span>&nbsp;
             </template>
-            <label>Created on: {{album.dateCreated}}</label>
+            <div class="label">Created on: {{album.dateCreated}}</div>
           </h1>
         </div>
         <template is="dom-if" if="{{album.photos.length}}">
@@ -128,6 +134,7 @@
         // this is needed because editing the album object directly does not store the object.
         // This looks like a weird localstorage and data-binding bug in Polymer.
         var album = Object.assign({}, this.album);
+
         album.photos = photos;
 
         // Step 4: store the album. save localstorage data.

@@ -6,14 +6,37 @@
 
 <dom-module id="viv-gallery">
   <style>
+    .img-container {
+      height: 500px;
+      width: 600px;
+    }
+
     img {
-      max-height: 400px;
-      width: 500px;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    @media only screen
+      and (max-device-width: 480px) {
+      .img-container {
+        height: 200px;
+        width: 250px;
+      }
+    }
+
+    @media only screen
+      and (min-device-width: 480px)
+      and (max-device-width: 768px) {
+      .img-container {
+        height: 300px;
+        width: 400px;
+      }
     }
 
     .album {
       margin-top: 10px;
       padding: 20px;
+      height: 400px;
     }
 
     .delete-button {
@@ -23,6 +46,7 @@
 
     .photo-info {
       align-items: center;
+      -webkit-align-items: center;
     }
   </style>
   <template>
@@ -42,18 +66,20 @@
         <!-- If there are photos display the gallery. you have the option to go back and forward.-->
         <template is="dom-if" if="{{areTherePhotos}}">
           <section class="horizontal layout center-center album">
-            <paper-icon-button icon="icons:chevron-left" on-click="_goBack"></paper-icon-button>
+            <paper-icon-button id="backBtn" icon="icons:chevron-left" on-click="_goBack" disabled></paper-icon-button>
             <div class="vertical layout">
-              <img src="{{currentPhoto}}" />
+              <div class="img-container horizontal layout center-center">
+                <img src="{{currentPhoto}}" />
+              </div>
               <div class="photo-info horizontal layout justified">
-                <label>Date added: {{getCreatedDate()}}</label>
+                <div class="label">Date added: {{getCreatedDate()}}</div>
                 <paper-button class="passive delete-button" on-click="_deletePhoto">
                   <iron-icon icon="icons:delete"></iron-icon>
                   Delete photo
                 </paper-button>
               </div>
             </div>
-            <paper-icon-button icon="icons:chevron-right" on-click="_goForward"></paper-icon-button>
+            <paper-icon-button id="nextBtn" icon="icons:chevron-right" on-click="_goForward"></paper-icon-button>
           </section>
         </template>
 
@@ -105,7 +131,8 @@
         currentPhotoIdx: {
           type: Number,
           value: -1,
-          notify: true
+          notify: true,
+          observer: '_currentPhotoIdxChanged'
         },
         currentPhoto: {
           type: String,
@@ -133,6 +160,22 @@
         return this.album.photos[this.currentPhotoIdx].dateAdded;
       },
 
+      _currentPhotoIdxChanged: function() {
+        var backBtn = this.querySelector('#backBtn');
+        var nextBtn = this.querySelector('#nextBtn');
+
+        if (backBtn && nextBtn) {
+          backBtn.disabled = false;
+          nextBtn.disabled = false;
+          if (this.currentPhotoIdx <= 0) {
+            backBtn.disabled = true;
+          }
+          if (this.currentPhotoIdx >= this.album.photos.length - 1) {
+            nextBtn.disabled = true;
+          }
+        }
+      },
+
       /*
        Listen for right and left arrow keys and attach them to moving forward and back in the gallery.
        */
@@ -150,7 +193,7 @@
       getPhotoUrl: function() {
         if (this.album.photos && this.album.photos.length) {
           var photo = this.album.photos[this.currentPhotoIdx];
-          return `http://c2.staticflickr.com/${photo.farm}/${photo.server}/${photo.id}_${photo.secret}_c.jpg`;
+          return fetchFlickrImageUrlFromPhoto(photo, 'full');
         }
       },
 

@@ -16,34 +16,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     // More info: https://visionmedia.github.io/page.js/
     page('/', function () {
       app.route = 'home';
-      app.scrollPageToTop();
     });
 
     page('/search', function() {
       app.route = 'search';
-      app.scrollPageToTop();
     });
 
     page('/search/:keywords', function(data) {
       app.route = 'search';
       app.params = data.params;
-      app.scrollPageToTop();
     });
 
     page('/search/location/:latlng', function(data) {
       app.route = 'search';
       app.params = data.params;
-      app.scrollPageToTop();
     });
 
     page('/album', function() {
       app.route = 'album';
-      app.scrollPageToTop();
     });
 
     page('/gallery', function() {
       app.route = 'gallery';
-      app.scrollPageToTop();
     });
 
     // add #! before urls

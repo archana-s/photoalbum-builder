@@ -26,11 +26,14 @@
 
     search-box {
       flex: 1;
+      -webkit-flex: 1;
       align-self: flex-start;
+      -webkit-align-self: flex-start;
     }
 
     .tool-box {
       align-items: center;
+      -webkit-align-items: center;
     }
 
   </style>
@@ -207,7 +210,7 @@
       },
 
       formatDate: function(date) {
-        return `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`;
+        return (date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear();
       },
 
       appendDateToPhotos: function(photos) {
@@ -222,7 +225,11 @@
         var photosListElem = this.querySelector('#searchedPhotos');
         var photos = this.appendDateToPhotos(photosListElem.selectedPhotos);
 
-        var album = Object.assign({}, this.album);
+        var album = {};
+
+        if (this.album) {
+          album = Object.assign({}, this.album);
+        }
 
         if (!this.album) {
           var date = new Date();

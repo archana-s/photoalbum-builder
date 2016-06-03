@@ -39,14 +39,13 @@
       height: 400px;
     }
 
-    .delete-button {
-      max-width: 200px;
-      margin-top: 10px;
-    }
-
     .photo-info {
       align-items: center;
       -webkit-align-items: center;
+    }
+
+    .delete-button {
+      margin-left: 12px;
     }
   </style>
   <template>
@@ -71,12 +70,10 @@
               <div class="img-container horizontal layout center-center">
                 <img src="{{currentPhoto}}" />
               </div>
-              <div class="photo-info horizontal layout justified">
+              <div class="photo-info horizontal layout end-justified wrap">
                 <div class="label">Date added: {{getCreatedDate()}}</div>
-                <paper-button class="passive delete-button" on-click="_deletePhoto">
-                  <iron-icon icon="icons:delete"></iron-icon>
-                  Delete photo
-                </paper-button>
+                <paper-icon-button class="delete-button" on-click="_deletePhoto" icon="icons:delete">
+                </paper-icon-button>
               </div>
             </div>
             <paper-icon-button id="nextBtn" icon="icons:chevron-right" on-click="_goForward"></paper-icon-button>
