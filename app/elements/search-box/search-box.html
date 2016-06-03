@@ -156,7 +156,7 @@
        */
       _updateLocationsList: function() {
         this.keywords = this.$.searchInput.value;
-        if (this.keywords.length === 0) {
+        if (this.keywords.length < 2) {
           this.set('locations', []);
         } else {
           var params = {
