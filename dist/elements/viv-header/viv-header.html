@@ -32,7 +32,9 @@
       is: 'viv-header',
       _onHeaderClick: function() {
         window.location.href = '#!';
-        // the routes are automatically not reloaded in this starter kit because of #!, as a result, manually triggering it.
+        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
+        // hence using a button with an action.
+        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
         window.location.reload();
       }
     });

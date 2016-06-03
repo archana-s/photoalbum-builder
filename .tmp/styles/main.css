@@ -7,6 +7,10 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 */
 
+/**
+* This file contains styles that is common to all pages and can and should be reused.
+* Can be considered a stripped down styleguide for this app.
+**/
 body {
   color: black;
   font-size: 14px;

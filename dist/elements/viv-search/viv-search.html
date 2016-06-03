@@ -1,0 +1,265 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../searched-photos/searched-photos.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-request.html">
+<link rel="import" href="../search-box/search-box.html">
+<link rel="import" href="../album-button-small/album-button-small.html">
+
+<dom-module id="viv-search">
+  <style>
+
+    :host {
+      background-color: #DDD;
+    }
+
+    paper-input {
+      width: 300px;
+    }
+
+    paper-button.load-more {
+      width: 180px;
+      margin: 20px 0  ;
+    }
+
+    search-box {
+      flex: 1;
+      align-self: flex-start;
+    }
+
+    .tool-box {
+      align-items: center;
+    }
+
+  </style>
+
+  <template>
+
+    <iron-localstorage name="album"
+      value="{{album}}" id="localStorage"
+    ></iron-localstorage>
+
+    <iron-ajax
+      id="ajaxRequest"
+      url="https://api.flickr.com/services/rest/"
+      handle-as="json"
+      debounce-duration="300"
+      on-response="_handleResponse"
+      on-error="_handleError"
+      last-response="{{response}}"></iron-ajax>
+
+    <section class="tool-box layout horizontal wrap">
+      <div class="flex-1">
+        <search-box></search-box>
+      </div>
+      <template is="dom-if" if="{{album.photos}}">
+        <album-button-small name="{{album.name}}"></album-button-small>
+      </template>
+    </section>
+
+    <template is="dom-if" if="{{photos.length}}">
+      <section class="presentation-area">
+        <paper-button raised on-click="_addPhotosToAlbum" class="primary external-action-button">
+          <iron-icon icon="icons:add" class="small"></iron-icon>
+          Add Photos to Album
+        </paper-button>
+
+        <searched-photos id="searchedPhotos" photos="{{photos}}"></searched-photos>
+
+        <template is="dom-if" if="{{areThereMorePagesToLoad}}">
+          <div class="layout horizontal center-center">
+            <paper-button raised on-click="_loadMorePhotos" class="load-more passive">Load more ...</paper-button>
+          </div>
+        </template>
+     </section>
+    </template>
+
+    <template is="dom-if" if="{{isNoPhotosFound}}">
+      <section class="empty-state  horizontal layout center-center">
+        <iron-icon icon="icons:info" class="small"></iron-icon>
+        Sorry, no images were found for the search. Please try something else.
+      </section>
+    </template>
+
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'viv-search',
+
+      properties: {
+        keywords: {
+          type: String,
+          value: '',
+          observer: '_keywordsChanged'
+        },
+        latlng: {
+          type: String,
+          observer: '_latlngChanged'
+        },
+        photos: {
+          type: Array,
+          observer: '_photosChanged',
+          value: [],
+          notify: true
+        },
+        album: {
+          type: Object,
+          value: {}
+        },
+        currentPage: {
+          type: Number,
+          value: 1
+        },
+        maxPages: {
+          type: Number,
+          value: 0
+        },
+        response: {
+          type: Object,
+          value: null,
+          observer: "_responseChanged"
+        },
+        isNoPhotosFound: false,
+        areThereMorePagesToLoad: false
+      },
+
+      // If the keywords provided is a valid address/geographic location
+      // pick up images from the corresponding lat and long.
+      // If not fetch images for the keywords.
+      getPhotosFromFlickr: function() {
+        var params = {
+          method: 'flickr.photos.search',
+          api_key: '6338d0c1c1cfbae7acb2fe7c7ae92bb9',
+          format: 'json',
+          nojsoncallback: 1,
+          page: this.currentPage
+        };
+
+        if (this.latlng) {
+          var geometry = this.latlng.split('~');
+          params.lat = geometry[0];
+          params.lon = geometry[1];
+        } else if (this.keywords) {
+          params.tags = decodeURIComponent(this.keywords);
+        }
+
+        this.$.ajaxRequest.params = params;
+        this.$.ajaxRequest.generateRequest();
+      },
+
+      resetCounters: function() {
+        this.currentPage = 1;
+        this.maxPages = 0;
+      },
+
+      _keywordsChanged: function() {
+        this.resetCounters();
+        if (this.keywords) {
+          this.getPhotosFromFlickr();
+        }
+      },
+
+      _latlngChanged: function() {
+        this.resetCounters();
+        if (this.latlng) {
+          this.getPhotosFromFlickr();
+        }
+      },
+
+      _handleResponse: function(e) {
+      },
+
+      _handleError: function(err) {
+      },
+
+      _photosChanged: function() {
+      },
+
+      _responseChanged: function() {
+        if (this.keywords || this.latlng) {
+          if (this.response && this.response.photos && typeof this.response.photos === 'object') {
+            if (this.response.photos.photo.length) {
+              this.maxPages = this.response.photos.pages;
+              this.areThereMorePagesToLoad = this.currentPage < this.maxPages;
+              this.set('photos', this.photos.concat(this.response.photos.photo));
+              this.isNoPhotosFound = false;
+            } else {
+              this.isNoPhotosFound = true;
+            }
+          }
+        }
+      },
+
+      goToAlbum: function() {
+        window.location.href = '/#!/album';
+        // Polymer does not offer any anchor-tags due to anchor tag in shadow root problems,
+        // hence using a button with an action.
+        // the routes are automatically not reloaded in this starter kit, as a result, manually triggering it.
+        window.location.reload();
+      },
+
+      formatDate: function(date) {
+        return `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`;
+      },
+
+      appendDateToPhotos: function(photos) {
+        var date = new Date();
+        photos.forEach(function(photo) {
+          photo.dateAdded = this.formatDate(date);
+        }.bind(this));
+        return photos;
+      },
+
+      _addPhotosToAlbum: function() {
+        var photosListElem = this.querySelector('#searchedPhotos');
+        var photos = this.appendDateToPhotos(photosListElem.selectedPhotos);
+        var album = this.album;
+
+        if (!this.album) {
+          var date = new Date();
+          album = {
+            name: 'My album',
+            photos: [],
+            dateCreated: this.formatDate(date)
+          }
+        }
+
+        if (this.album && !this.album.photos) {
+          album.photos = [];
+        }
+
+        album.photos = album.photos.concat(photos);
+
+        this.set('album', album);
+        this.$.localStorage.save();
+        photosListElem.fire('selections:complete');
+        this.goToAlbum();
+      },
+
+      _loadMorePhotos: function() {
+        this.currentPage++;
+        this.getPhotosFromFlickr();
+      },
+
+      _goToAlbum: function() {
+        var photosList = this.querySelector('#searchedPhotos');
+        if (photosList && photosList.selectedPhotos && photosList.selectedPhotos.length) {
+          var warning = 'You have some images selected. If you move without adding them,\
+            they will not be added to your album. Are you sure you want to move to album?';
+          if (window.confirm(warning)) {
+            this.goToAlbum();
+          }
+        } else {
+          this.goToAlbum();
+        }
+      }
+
+    });
+  })();
+  </script>
+</dom-module>

@@ -60,13 +60,9 @@
 
   </style>
 
-  <!-- This section lists photos either from a search or in the album and helps select them for
-      any operations.
-  -->
   <template>
-    <!-- If else is handled through the template element. Used that instead of toggling in javascript/CSS -->
+
     <template is="dom-if" if="{{photos.length}}">
-      <!--Displays action and info about photos. Presents number of photos and gives you the option to select all/unselect all -->
       <section class="horizontal layout end-justified action-box">
         <label>{{photos.length}} photos</label>
         <paper-button raised on-click="_selectAllPhotos" class="secondary">
@@ -79,9 +75,7 @@
         </paper-button>
       </section>
 
-      <!-- This is the actual list of photos in thumbnails -->
       <ul id="photosList" class="layout horizontal center-center wrap" on-click="_handlePhotoSelection">
-        <!-- Dom repeat is a neat way to loop through elements -->
         <template is="dom-repeat" items="{{photos}}" as="photo">
           <li>
             <input type="checkbox" data-id="{{fetchImageUrl(photo)}}" id="{{photo.id}}" />
@@ -103,33 +97,25 @@
         photos: {
           type: Array,
           value: [],
+          observer: '_photosChanged',
           notify: true
         },
         selectedPhotos: {
           type: Array,
           value: [],
           notify: true,
+          observer: '_selectedPhotosChanged'
         }
       },
 
-      /* Attached is a lifecycle method. This is called after element is attached to the document.
-       * This is used for adding event listeners.
-       * This polymer element is listening to selections:complete to reset all UI selections (checkboxes)
-       * in the page.
-       */
       attached: function() {
         this.addEventListener('selections:complete', this._unselectAllPhotos);
       },
 
-      /* Detached is another lifecycle method. This is called after element is detached from document.
-       * Using this to remove event listeners.
-       */
       detached: function() {
         this.removeEventListener('selections:complete', this._unselectAllPhotos);
       },
 
-      /* Building the image url from different attributes for the photo.
-       */
       fetchImageUrl: function(photo) {
         return `http://c2.staticflickr.com/${photo.farm}/${photo.server}/${photo.id}_${photo.secret}_s.jpg`;
       },
@@ -145,16 +131,12 @@
 
       _handlePhotoSelection: function(evt) {
         if (evt.target.nodeName.toLowerCase() === 'img') {
-          // Step 1: Toggle the checkbox. This helps with accessibility too.
           var target = evt.target.parentNode.querySelector('input');
           target.checked = !target.checked;
 
-          // Step 2: Extract the photo id and info for the selected photo.
           var photoId = target.id;
           var photo = this.fetchPhotoForId(photoId);
 
-          // Step 3: update the selectedPhotos list with this new photo.
-          // If its remove, remove the selected photo from the list of selected photos.
           if (target.checked) {
             this.selectedPhotos.push(photo);
           } else {
@@ -164,6 +146,14 @@
             }
           }
         }
+      },
+
+      _photosChanged: function() {
+        this.notifyPath('photos', this.photos);
+      },
+
+      _selectedPhotosChanged: function() {
+        this.notifyPath('selectedPhotos', this.selectedPhotos);
       },
 
       _selectAllPhotos: function() {

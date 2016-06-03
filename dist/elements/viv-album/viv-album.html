@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
-<link rel="import" href="../../bower_components/iron-icons/places-icons.html">
+
 <link rel="import" href="../searched-photos/searched-photos.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../search-box/search-box.html">
 
 <dom-module id="viv-album">
@@ -33,51 +33,42 @@
       value="{{album}}"
     ></iron-localstorage>
 
-    <template is="dom-if" if="{{album}}">
-      <header class="layout horizontal">
-        <section class="title-section">
-          <h1>
-            <div contenteditable="true" on-blur="_nameChanged" id="albumName" class="album-name">{{album.name}}</div>
-            <template is="dom-if" if="{{album.photos.length}}">
-               <span class="auxiliary">{{album.photos.length}} photos</span>&nbsp;
-            </template>
-            <label>Created on: {{album.dateCreated}}</label>
-          </h1>
-        </section>
-        <template is="dom-if" if="{{album.photos.length}}">
-          <paper-button raised class="passive gallery-button" on-click="_goToGallery">
-            <iron-icon icon="image:photo-album"></iron-icon>
-            View as gallery
-          </paper-button>
-        </template>
-        <paper-button raised class="passive add-button" on-click="_goToSearchPage">
-          <iron-icon icon="icons:add"></iron-icon>
-          Add photos
-        </paper-button>
-      </header>
-
+    <header class="layout horizontal">
+      <section class="title-section">
+        <h1>
+          <div contenteditable="true" on-blur="_nameChanged" id="albumName" class="album-name">{{album.name}}</div>
+          <template is="dom-if" if="{{album.photos.length}}">
+             <span class="auxiliary">{{album.photos.length}} photos</span>&nbsp;
+          </template>
+          <label>Created on: {{album.dateCreated}}</label>
+        </h1>
+      </section>
       <template is="dom-if" if="{{album.photos.length}}">
-        <section class="presentation-area">
-          <paper-button raised on-click="_deletePhotos" class="external-action-button">
-            <iron-icon icon="icons:delete" class="small"></iron-icon>
-            Delete Selected Photos
-          </paper-button>
-          <searched-photos id="photosList" photos="{{album.photos}}"></searched-photos>
-        </section>
+        <paper-button raised class="passive gallery-button" on-click="_goToGallery">
+          <iron-icon icon="image:photo-album"></iron-icon>
+          View as gallery
+        </paper-button>
       </template>
+      <paper-button raised class="passive add-button" on-click="_goToSearchPage">
+        <iron-icon icon="icons:add"></iron-icon>
+        Add photos
+      </paper-button>
+    </header>
 
-      <template is="dom-if" if="{{!album.photos.length}}">
-        <section class="empty-state layout horizontal center-center">
-          <iron-icon icon="icons:info"></iron-icon>
-          You have no photos in your album. Use the Add Photos button on top to add photos.
-        </section>
-      </template>
+    <template is="dom-if" if="{{album.photos.length}}">
+      <section class="presentation-area">
+        <paper-button raised on-click="_deletePhotos" class="external-action-button">
+          <iron-icon icon="icons:delete" class="small"></iron-icon>
+          Delete Selected Photos
+        </paper-button>
+        <searched-photos id="photosList" photos="{{album.photos}}"></searched-photos>
+      </section>
     </template>
 
-    <template is="dom-if" if="{{!album}}">
-      <section class="empty-state horizontal layout center-center">
-        <iron-icon icon="places:spa"></iron-icon>
-        404 Nothing found here.
+    <template is="dom-if" if="{{!album.photos.length}}">
+      <section class="empty-state layout horizontal center-center">
+        <iron-icon icon="icons:info"></iron-icon>
+        You have no photos in your album. Use the search box above to search for photos and add them.
       </section>
     </template>
 

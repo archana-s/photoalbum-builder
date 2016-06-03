@@ -1,0 +1,36 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../album-builder-button/album-builder-button.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../album-button/album-button.html">
+
+<dom-module id="viv-home">
+  <style>
+  </style>
+  <template>
+
+    <iron-localstorage name="album" id="localStorage"
+      value="{{album}}"
+    ></iron-localstorage>
+
+    <main class="layout">
+      <template is="dom-if" if="{{!album}}">
+        <album-builder-button></album-builder-button>
+      </template>
+      <template is="dom-if" if="{{album}}">
+        <album-button album="{{album}}"></album-button>
+      </template>
+    </main>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'viv-home',
+      properties: {
+        album: Object
+      }
+    });
+  })();
+  </script>
+</dom-module>
