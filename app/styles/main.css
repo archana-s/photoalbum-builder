@@ -11,6 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 * This file contains styles that is common to all pages and can and should be reused.
 * Can be considered a stripped down styleguide for this app.
 **/
+
 body {
   color: black;
   font-size: 14px;
@@ -52,11 +53,6 @@ paper-button.album {
   height: 160px;
   color: #444;
   background-color: #EEE;
-}
-
-paper-button.primary, paper-icon-button.primary {
-  background-color: #243259;
-  color: white;
 }
 
 paper-button.passive, paper-icon-button.passive {

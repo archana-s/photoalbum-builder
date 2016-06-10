@@ -33,6 +33,20 @@
       There are 4 pages and each one is fully displayed by its element which is fully implemented in
       the elements directory.
     -->
+    <style is="custom-style">
+
+      /* Will be prevented from affecting local DOM of Polymer elements */
+      * {
+        box-sizing: border-box;
+      }
+
+      /* Use the :root selector to define custom properties and mixins */
+      /* at the document level  */
+      :root {
+        --primary-color: #489E4E;
+      }
+
+    </style>
     <pb-header></pb-header>
     <main>
       <iron-pages attr-for-selected="data-route" selected="{{route}}">
