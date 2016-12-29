@@ -14,7 +14,7 @@ The application is deployed in Firebase.
 * User can view the photos in thumbnails or as a gallery
 
 ### Set up
-* Please install node and gulp
+* Install node and gulp
 * Clone the repo
 * npm install
 * bower install (make sure .bowerrc is present)
